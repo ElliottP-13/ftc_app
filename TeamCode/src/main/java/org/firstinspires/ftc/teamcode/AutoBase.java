@@ -61,6 +61,44 @@ public class AutoBase extends LinearOpMode{
             runEncoder(leftTarget, rightTarget, timeoutS, speed);
         }
     }
+    public  void scanSensors(){//scans at 3 different angles so we get a better idea of what it is
+        int[][] values = new int[3][3];
+        robot.scanner.setPosition(.25);
+        values = putValues(values, 0);//puts them all in the array so i can look at them later and compare
+        robot.scanner.setPosition(.5);
+        values = putValues(values, 1);//hopefully i don't lose my previously stored info
+        robot.scanner.setPosition(.75);
+        values = putValues(values, 2);
+
+        //calculate
+        int sumRed = 0;
+        for (int i = 0; i < values.length; i++){
+            sumRed += values[i][0];//adds all of the values together
+        }
+        int sumBlue = 0;
+        for (int i = 0; i < values.length; i++){
+            sumBlue += values[i][2];
+        }
+        if(sumBlue > sumRed){
+            //its blue
+        }
+        else if(sumRed > sumBlue){
+            //its red
+        }
+        else{
+            //something went wrong, lets try again
+            //maybe move forward or backwards?
+            scanSensors();
+        }
+
+    }
+    private int[][] putValues(int[][] array, int scanNum){
+        array[scanNum][0] = robot.sensor.red();
+        array[scanNum][1] = robot.sensor.green();
+        array[scanNum][2] = robot.sensor.blue();
+
+        return array;
+    }
     private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed){//change to calc timeout
         robot.leftMotor.setTargetPosition(LtargetPos);
         robot.rightMotor.setTargetPosition(RtargetPos);

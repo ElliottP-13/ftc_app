@@ -45,41 +45,42 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
  * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p/>
  * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
  * It includes all the skeletal structure that all linear OpModes contain.
- *
+ * <p/>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto Test", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name = "Auto Test", group = "Linear Opmode")
 //@Disabled
 public class AutoTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    // DcMotor leftMotor = null;
-    // DcMotor rightMotor = null;
+    AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "blue", new String[]{"Blue", "Red"});
+    AutonomousTextOption startPos = new AutonomousTextOption("Start Position", "Middle", new String[]{"Mountain", "Middle", "Corner"});
+    AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
+    AutonomousBooleanOption pressBootin = new AutonomousBooleanOption("Bootin Press", true);
+    AutonomousIntOption waitButton = new AutonomousIntOption("Wait at Button", 0, 0, 20);
+    AutonomousBooleanOption blockButton = new AutonomousBooleanOption("Block other Button", false);
+    AutonomousTextOption mountain = new AutonomousTextOption("Mountain", allianceColor.getValue(), new String[]{"Blue", "Red", "Far Blue", "Far Red"});
+    AutonomousBooleanOption mountainClimbers = new AutonomousBooleanOption("Mountain Climbers", true);
+
+    AutonomousOption[] autoOptions = {allianceColor, startPos, waitStart, pressBootin, waitButton, blockButton, mountain, mountainClimbers};
+    int currentOption = 0;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.addLine("Initing");
         telemetry.update();
-        /* eg: Initialize the hardware variables. Note that the strings used here as parameters
-         * to 'get' must correspond to the names assigned during the robot configuration
-         * step (using the FTC Robot Controller app on the phone).
-         */
-        // leftMotor  = hardwareMap.dcMotor.get("left_drive");
-        // rightMotor = hardwareMap.dcMotor.get("right_drive");
 
-        // eg: Set the drive motor directions:
-        // "Reverse" the motor that runs backwards when connected directly to the battery
-        // leftMotor.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        // rightMotor.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
-
-        // Wait for the game to start (driver presses PLAY)
+        selectOptions();
+        if (allianceColor.getValue().equals("Red")) {
+            //directionadjustment = -1.0;
+        }
         waitForStart();
         runtime.reset();
 
@@ -89,7 +90,65 @@ public class AutoTest extends LinearOpMode {
         sleep(1000);
         print("now I am done!");
     }
-    private void print(String s){
+
+    public void selectOptions() {
+        boolean aPressed = false;
+        boolean yPressed = false;
+        boolean bPressed = false;
+        boolean xPressed = false;
+        while (currentOption < autoOptions.length && !opModeIsActive()) {
+            showOptions();
+            if (gamepad1.a && !aPressed) {
+                currentOption = currentOption + 1;
+                aPressed = true;
+            } else {
+                aPressed = gamepad1.a;
+            }
+            if (gamepad1.y && !yPressed) {
+                currentOption = currentOption - 1;
+                yPressed = true;
+            } else {
+                yPressed = gamepad1.y;
+            }
+            if (gamepad1.b && !bPressed) {
+                autoOptions[currentOption].nextValue();
+                bPressed = true;
+            } else {
+                bPressed = gamepad1.b;
+            }
+            if (gamepad1.x && !xPressed) {
+                autoOptions[currentOption].previousValue();
+                xPressed = true;
+            } else {
+                xPressed = gamepad1.x;
+            }
+        }
+    }
+
+    private void showOptions() {
+        String str = "";
+        switch (autoOptions[currentOption].optionType) {
+            case STRING:
+                str = ((AutonomousTextOption) autoOptions[currentOption]).getValue();
+                break;
+            case INT:
+                str = Integer.toString(((AutonomousIntOption) autoOptions[currentOption]).getValue());
+                break;
+            case BOOLEAN:
+                str = String.valueOf(((AutonomousBooleanOption) autoOptions[currentOption]).getValue());
+                break;
+        }
+        telemetry.addLine("Current Number: " + currentOption);
+        telemetry.addLine("Current Option: " + str);
+        telemetry.update();
+    }
+
+    private void showOptions(String additonalInfo) {
+        telemetry.addLine(additonalInfo);
+        showOptions();
+    }
+
+    private void print(String s) {
         telemetry.addLine(s);
         telemetry.update();
     }
