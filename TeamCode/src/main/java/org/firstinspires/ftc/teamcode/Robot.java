@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
@@ -17,7 +18,7 @@ public class Robot{
     DcMotor shooter;
     Servo scanner;
     ColorSensor sensor;
-    ColorSensor  lineSensor;
+    LightSensor lineSensor;
     public Robot(HardwareMap HMap){
         // Save reference to Hardware map
         map = HMap;
@@ -30,7 +31,7 @@ public class Robot{
         //shooter = hardwareMap.dcMotor.get("Shooter");
         scanner = map.servo.get("Scanner");
         sensor = map.colorSensor.get("Sensor");
-        lineSensor = map.colorSensor.get("Line Sensor");
+        lineSensor = map.lightSensor.get("Line Sensor");
 
     }
 

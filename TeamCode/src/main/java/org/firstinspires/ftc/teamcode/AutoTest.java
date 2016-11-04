@@ -59,17 +59,6 @@ public class AutoTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "blue", new String[]{"Blue", "Red"});
-    AutonomousTextOption startPos = new AutonomousTextOption("Start Position", "Middle", new String[]{"Mountain", "Middle", "Corner"});
-    AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
-    AutonomousBooleanOption pressBootin = new AutonomousBooleanOption("Bootin Press", true);
-    AutonomousIntOption waitButton = new AutonomousIntOption("Wait at Button", 0, 0, 20);
-    AutonomousBooleanOption blockButton = new AutonomousBooleanOption("Block other Button", false);
-    AutonomousTextOption mountain = new AutonomousTextOption("Mountain", allianceColor.getValue(), new String[]{"Blue", "Red", "Far Blue", "Far Red"});
-    AutonomousBooleanOption mountainClimbers = new AutonomousBooleanOption("Mountain Climbers", true);
-
-    AutonomousOption[] autoOptions = {allianceColor, startPos, waitStart, pressBootin, waitButton, blockButton, mountain, mountainClimbers};
-    int currentOption = 0;
 
     @Override
     public void runOpMode() {
@@ -77,10 +66,7 @@ public class AutoTest extends LinearOpMode {
         telemetry.addLine("Initing");
         telemetry.update();
 
-        selectOptions();
-        if (allianceColor.getValue().equals("Red")) {
-            //directionadjustment = -1.0;
-        }
+
         waitForStart();
         runtime.reset();
 
@@ -89,63 +75,6 @@ public class AutoTest extends LinearOpMode {
         print("I waited 1000 milis");
         sleep(1000);
         print("now I am done!");
-    }
-
-    public void selectOptions() {
-        boolean aPressed = false;
-        boolean yPressed = false;
-        boolean bPressed = false;
-        boolean xPressed = false;
-        while (currentOption < autoOptions.length && !opModeIsActive()) {
-            showOptions();
-            if (gamepad1.a && !aPressed) {
-                currentOption = currentOption + 1;
-                aPressed = true;
-            } else {
-                aPressed = gamepad1.a;
-            }
-            if (gamepad1.y && !yPressed) {
-                currentOption = currentOption - 1;
-                yPressed = true;
-            } else {
-                yPressed = gamepad1.y;
-            }
-            if (gamepad1.b && !bPressed) {
-                autoOptions[currentOption].nextValue();
-                bPressed = true;
-            } else {
-                bPressed = gamepad1.b;
-            }
-            if (gamepad1.x && !xPressed) {
-                autoOptions[currentOption].previousValue();
-                xPressed = true;
-            } else {
-                xPressed = gamepad1.x;
-            }
-        }
-    }
-
-    private void showOptions() {
-        String str = "";
-        switch (autoOptions[currentOption].optionType) {
-            case STRING:
-                str = ((AutonomousTextOption) autoOptions[currentOption]).getValue();
-                break;
-            case INT:
-                str = Integer.toString(((AutonomousIntOption) autoOptions[currentOption]).getValue());
-                break;
-            case BOOLEAN:
-                str = String.valueOf(((AutonomousBooleanOption) autoOptions[currentOption]).getValue());
-                break;
-        }
-        telemetry.addLine("Current Number: " + currentOption);
-        telemetry.addLine("Current Option: " + str);
-        telemetry.update();
-    }
-
-    private void showOptions(String additonalInfo) {
-        telemetry.addLine(additonalInfo);
-        showOptions();
     }
 
     private void print(String s) {

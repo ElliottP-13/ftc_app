@@ -6,6 +6,9 @@ package org.firstinspires.ftc.teamcode;
 public class AutoMain extends AutoBase{
     @Override
     public void runOpMode() {
+        initialize();
+        waitForStart();
+
         driveStraight(60, 6);
         turn(-90, 10);
         driveStraight(60, 6);

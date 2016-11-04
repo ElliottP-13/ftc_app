@@ -24,11 +24,28 @@ public class AutoBase extends LinearOpMode{
 
     Robot robot = new Robot(hardwareMap);
 
+    AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "Blue", new String[]{"Blue", "Red"});
+    AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
+    AutonomousBooleanOption pressBootin = new AutonomousBooleanOption("Bootin Press", true);
+    AutonomousBooleanOption pressOtherBootin = new AutonomousBooleanOption("Bootin 2 Press", true);
+    AutonomousTextOption afterButton = new AutonomousTextOption("After Button", "Park Corner", new String[]{"Park Corner", "Block Buttons"});
+
+    AutonomousOption[] autoOptions = {allianceColor, waitStart, pressBootin, pressOtherBootin, afterButton};
+    int currentOption = 0;
+
+    double directonAdjust = 1.0;
+
     @Override
     public void runOpMode() {
         //do nothing because this is the base class
     }
-    public void turn(double degrees, double timeout){
+    public void initialize(){
+        selectOptions();
+        if (allianceColor.getValue().equals("Red")) {
+            directonAdjust = -1.0;
+        }
+    }
+    public void turn(double degrees, double timeout){//defaults to the right, go left w/ -degrees
         turn(turnSpeed, degrees, timeout);
     }
     public void driveStraight(double inches, double timeout){
@@ -60,6 +77,15 @@ public class AutoBase extends LinearOpMode{
             rightTarget = robot.rightMotor.getCurrentPosition() + (int) (inches * countsPerInch);
             runEncoder(leftTarget, rightTarget, timeoutS, speed);
         }
+    }
+    public void detectLine(){
+        while(robot.lineSensor.getRawLightDetected() < 120){//loops through until we see the line
+            robot.leftMotor.setPower(.3);
+            robot.rightMotor.setPower(.3);
+        }
+        turn(90, 5);//turns right
+        //hopefully we are right in front of beacon
+        scanSensors();//we see the button.
     }
     public  void scanSensors(){//scans at 3 different angles so we get a better idea of what it is
         int[][] values = new int[3][3];
@@ -135,5 +161,59 @@ public class AutoBase extends LinearOpMode{
 
         //  sleep(250);   // optional pause after each move
     }
+    public void selectOptions() {
+        boolean aPressed = false;
+        boolean yPressed = false;
+        boolean bPressed = false;
+        boolean xPressed = false;
+        while (currentOption < autoOptions.length && !opModeIsActive()) {
+            showOptions();
+            if (gamepad1.a && !aPressed) {
+                currentOption = currentOption + 1;
+                aPressed = true;
+            } else {
+                aPressed = gamepad1.a;
+            }
+            if (gamepad1.y && !yPressed) {
+                currentOption = currentOption - 1;
+                yPressed = true;
+            } else {
+                yPressed = gamepad1.y;
+            }
+            if (gamepad1.b && !bPressed) {
+                autoOptions[currentOption].nextValue();
+                bPressed = true;
+            } else {
+                bPressed = gamepad1.b;
+            }
+            if (gamepad1.x && !xPressed) {
+                autoOptions[currentOption].previousValue();
+                xPressed = true;
+            } else {
+                xPressed = gamepad1.x;
+            }
+        }
+    }
 
+    private void showOptions() {
+        String str = "";
+        switch (autoOptions[currentOption].optionType) {
+            case STRING:
+                str = ((AutonomousTextOption) autoOptions[currentOption]).getValue();
+                break;
+            case INT:
+                str = Integer.toString(((AutonomousIntOption) autoOptions[currentOption]).getValue());
+                break;
+            case BOOLEAN:
+                str = String.valueOf(((AutonomousBooleanOption) autoOptions[currentOption]).getValue());
+                break;
+        }
+        telemetry.addLine("Current Number: " + currentOption);
+        telemetry.addLine("Current Option: " + str);
+        telemetry.update();
+    }
+    private void showOptions(String additonalInfo) {
+        telemetry.addLine(additonalInfo);
+        showOptions();
+    }
 }
