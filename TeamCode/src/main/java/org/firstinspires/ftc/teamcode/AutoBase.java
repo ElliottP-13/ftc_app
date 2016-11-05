@@ -26,11 +26,12 @@ public class AutoBase extends LinearOpMode{
 
     AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "Blue", new String[]{"Blue", "Red"});
     AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
+    AutonomousTextOption hitCap = new AutonomousTextOption("Hit Cap Ball", "Hit Cap", new String[]{"Hit Cap", "Go Corner", "Neither"});
     AutonomousBooleanOption pressBootin = new AutonomousBooleanOption("Bootin Press", true);
     AutonomousBooleanOption pressOtherBootin = new AutonomousBooleanOption("Bootin 2 Press", true);
-    AutonomousTextOption afterButton = new AutonomousTextOption("After Button", "Park Corner", new String[]{"Park Corner", "Block Buttons"});
+    AutonomousTextOption afterButton = new AutonomousTextOption("After Button", "Park Corner", new String[]{"Park Corner", "Block"});
 
-    AutonomousOption[] autoOptions = {allianceColor, waitStart, pressBootin, pressOtherBootin, afterButton};
+    AutonomousOption[] autoOptions = {allianceColor, waitStart, hitCap, pressBootin, pressOtherBootin, afterButton};
     int currentOption = 0;
 
     double directonAdjust = 1.0;
@@ -215,5 +216,16 @@ public class AutoBase extends LinearOpMode{
     private void showOptions(String additonalInfo) {
         telemetry.addLine(additonalInfo);
         showOptions();
+    }
+    public void print(String info){
+        telemetry.addLine(info);
+        telemetry.update();
+    }
+    public void nap(int time){
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
