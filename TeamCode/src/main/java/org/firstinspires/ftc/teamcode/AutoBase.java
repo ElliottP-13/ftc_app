@@ -47,7 +47,7 @@ public class AutoBase extends LinearOpMode{
         }
     }
     public void turn(double degrees, double timeout){//defaults to the right, go left w/ -degrees
-        turn(turnSpeed, degrees, timeout);
+        turn(turnSpeed, degrees * directonAdjust, timeout);
     }
     public void driveStraight(double inches, double timeout){
         driveStraight(driveSpeed, inches, timeout);
@@ -60,8 +60,8 @@ public class AutoBase extends LinearOpMode{
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            leftTarget = robot.leftMotor.getCurrentPosition() + (int) (degrees * countsPerDegree);
-            rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree);
+            leftTarget = robot.leftMotor.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
+            rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             runEncoder(leftTarget, rightTarget, timeoutS, speed);
         }
     }
