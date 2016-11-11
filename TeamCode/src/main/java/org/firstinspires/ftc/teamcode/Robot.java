@@ -27,7 +27,7 @@ public class Robot{
         leftMotor = map.dcMotor.get("Left Drive");
         rightMotor = map.dcMotor.get("Right Drive");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
-        //harvester = hardwareMap.dcMotor.get("Harvester");
+        harvester = map.dcMotor.get("Harvester");
         //shooter = hardwareMap.dcMotor.get("Shooter");
         scanner = map.servo.get("Scanner");
         sensor = map.colorSensor.get("Sensor");

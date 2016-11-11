@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -12,8 +13,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class AutoBase extends LinearOpMode{
     public ElapsedTime runtime = new ElapsedTime();
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 0.5 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 3.75 ;     // For figuring circumference
     static final double     countsPerInch           = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
@@ -21,8 +22,10 @@ public class AutoBase extends LinearOpMode{
             (WHEEL_DIAMETER_INCHES * 3.1415);
     static final double     driveSpeed              = 0.7;
     static final double     turnSpeed               = 0.5;
+    static final double     miliPerInch             = 52.57;
+    static final double     miliPerDegree           = 12.55;
 
-    Robot robot = new Robot(hardwareMap);
+    Robot robot = null;
 
     AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "Blue", new String[]{"Blue", "Red"});
     AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
@@ -40,14 +43,15 @@ public class AutoBase extends LinearOpMode{
     public void runOpMode() {
         //do nothing because this is the base class
     }
-    public void initialize(){
+    public void initialize(HardwareMap map){
+        robot = new Robot(map);
         selectOptions();
         if (allianceColor.getValue().equals("Red")) {
             directonAdjust = -1.0;
         }
     }
     public void turn(double degrees, double timeout){//defaults to the right, go left w/ -degrees
-        turn(turnSpeed, degrees * directonAdjust, timeout);
+        turn(turnSpeed, degrees, timeout);
     }
     public void driveStraight(double inches, double timeout){
         driveStraight(driveSpeed, inches, timeout);
@@ -58,18 +62,52 @@ public class AutoBase extends LinearOpMode{
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
-
             // Determine new target position, and pass to motor controller
             leftTarget = robot.leftMotor.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
             rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             runEncoder(leftTarget, rightTarget, timeoutS, speed);
         }
     }
-
-    public void driveStraight(double speed, double inches, double timeoutS) {//**make a calc timeout**
+    public void driveTime(double inches){
+        if(opModeIsActive()){
+            double Rpower = 1;
+            double Lpower = Rpower - .01;
+            if(inches < 0){
+                Lpower *= -1;
+                Rpower *= -1;
+            }
+            robot.leftMotor.setPower(Lpower);
+            robot.rightMotor.setPower(Rpower);
+            sleep((long) (miliPerInch * inches));
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+            sleep(125);
+        }
+    }
+    public void turnTime(double degrees){
+        if (degrees > 0){//turn right
+            robot.leftMotor.setPower(.7);
+            robot.rightMotor.setPower(-.7);
+            sleep((long) (miliPerDegree * degrees));
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+        }
+        if (degrees < 0){//turn left
+            robot.leftMotor.setPower(-.7);
+            robot.rightMotor.setPower(.7);
+            sleep((long) (miliPerDegree * degrees));
+            robot.leftMotor.setPower(0);
+            robot.rightMotor.setPower(0);
+        }
+        sleep(125);
+    }
+    public void driveStraight(double speed, double inches, double timeoutS){//**make a calc timeout**
         int leftTarget;
         int rightTarget;
 
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        idle();
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 

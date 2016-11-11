@@ -3,11 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -21,8 +17,8 @@ public class Tele extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        print("init");
         Robot bot = new Robot(hardwareMap);
+        print("init");
         waitForStart();
         runtime.reset();
 
@@ -39,7 +35,7 @@ public class Tele extends LinearOpMode {
             //harvester
             clip(bot.harvester, gamepad2.left_stick_y, 0.5);
             //shooter
-            clip(bot.shooter, gamepad2.right_stick_y, 1);
+            //clip(bot.shooter, gamepad2.right_stick_y, 1);
 
         }
 

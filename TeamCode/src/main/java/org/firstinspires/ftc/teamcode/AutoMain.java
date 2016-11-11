@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
 /**
  * Created by Elliott on 10/31/2016.
  */
+@Autonomous(name = "Auto Main", group = "Linear Opmode")
 public class AutoMain extends AutoBase{
     @Override
     public void runOpMode() {
-        initialize();
+        initialize(hardwareMap);
         waitForStart();
         startFork();
     }
