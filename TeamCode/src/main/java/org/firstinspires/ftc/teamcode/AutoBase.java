@@ -13,16 +13,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class AutoBase extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
 
-    static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 2;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 3.75;     // For figuring circumference
-    static final double countsPerInch = 95.12;
-    static final double countsPerDegree = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double countsPerInch = 89.174;
+    static final double countsPerDegree = 14.9;
     static final double driveSpeed = 0.7;
     static final double turnSpeed = 0.5;
     static final double miliPerInch = 52.57;
-    static final double miliPerDegree = 12.55;
+    static final double miliPerDegree = 8.366;
     static final double voltChange = 0.7;
     Robot robot = null;
 
@@ -69,7 +65,7 @@ public class AutoBase extends LinearOpMode {
             // Determine new target position, and pass to motor controller
             leftTarget = robot.leftMotor.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
             rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
-            runEncoder(leftTarget, rightTarget, timeoutS, speed);
+            runEncoder(leftTarget, rightTarget, timeoutS, speed, false);
         }
     }
 
@@ -148,7 +144,7 @@ public class AutoBase extends LinearOpMode {
             // Determine new target position, and pass to motor controller
             leftTarget = robot.leftMotor.getCurrentPosition() + (int) (inches * countsPerInch);
             rightTarget = robot.rightMotor.getCurrentPosition() + (int) (inches * countsPerInch);
-            runEncoder(leftTarget, rightTarget, timeoutS, speed);
+            runEncoder(leftTarget, rightTarget, timeoutS, speed, true);
         }
     }
 
@@ -206,7 +202,7 @@ public class AutoBase extends LinearOpMode {
         return array;
     }
 
-    private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed) {//change to calc timeout
+    private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed, boolean equalize) {//change to calc timeout
         robot.leftMotor.setTargetPosition(LtargetPos);
         robot.rightMotor.setTargetPosition(RtargetPos);
 
@@ -226,7 +222,7 @@ public class AutoBase extends LinearOpMode {
                 (robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) &&
                 !passedTarget) {
             int delta = Math.abs(robot.leftMotor.getCurrentPosition() - robot.rightMotor.getCurrentPosition());
-            if (delta > 10) {
+            if ((delta > 10) && equalize) {
                 if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(robot.rightMotor.getCurrentPosition())) {
                     robot.leftMotor.setPower(robot.leftMotor.getPower() - .01);
                 } else if (Math.abs(robot.leftMotor.getCurrentPosition()) < Math.abs(robot.rightMotor.getCurrentPosition())) {

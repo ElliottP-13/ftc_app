@@ -16,112 +16,145 @@ public class AutoMain extends AutoBase{
         startFork();
     }
     private void startFork(){
-        if (start.getValue().equals("Hit Cap")){
-            driveTime(60);//DeCapps
-            capFork();
+        //start position two
+        if(startPosition.getValue().equals("Two")){
+            if (start.getValue().equals("Hit Cap")){
+                driveStraight(60, 10);//DeCapps
+                capFork();
+            }
+            else if (start.getValue().equals("Go Corner")){
+                print("going corner");
+                driveStraight(24, 10);
+                turn(100, 10);
+                driveStraight(25, 10);//goes to corner ****Needs Adjustments so Straight On***
+                turn(90, 10);
+                driveStraight(24, 10);
+                robot.harvester.setPower(-.8);
+                nap(2000);//waits for us to score in corner goal
+                cornerFork();
+            }
+            else {
+                driveStraight(30, 10);
+                turn(90, 10);
+                driveStraight(30, 10);
+                turn(-45, 10);
+                driveStraight(18, 10);
+                turn(-70, 10);//should be 45 but something is weird other turns are fine, this one too short
+                neitherFork();
+            }
         }
-        else if (start.getValue().equals("Go Corner")){
-            driveTime(24);
-            turnTime(100);
-            driveTime(25);//goes to corner ****Needs Adjustments so Straight On***
-            turnTime(90);
-            driveTime(24);
-            robot.harvester.setPower(-.8);
-            nap(2000);//waits for us to score in corner goal
-            cornerFork();
-        }
+        //start position one
         else {
-            driveTime(30);
-            turnTime(90);
-            driveTime(30);
-            turnTime(-45);
-            driveTime(18);
-            turnTime(-70);//should be 45 but something is weird other turns are fine, this one too short
-            neitherFork();
+            if (start.getValue().equals("Hit Cap")){
+                driveStraight(10, 10);//DeCapps
+                turn(45, 10);
+                driveStraight(45, 10);
+                capFork();
+            }
+            else if (start.getValue().equals("Go Corner")){
+                print("go Corner");
+                driveStraight(20, 10);
+                turn(90, 10);
+                driveStraight(47, 10);//goes to corner ****Needs Adjustments so Straight On***
+                turn(45, 10);
+                driveStraight(37, 10);
+                robot.harvester.setPower(-.8);
+                nap(2000);//waits for us to score in corner goal
+                cornerFork();
+            }
+            else {//do neither fork
+                driveStraight(10, 10);
+                turn(90, 10);
+                driveStraight(47, 10);
+                turn(-45, 10);
+                driveStraight(20, 10);
+                turn(-45, 10);
+                neitherFork();
+            }
         }
     }
     private void capFork(){
         if((pressOtherBootin.getValue() && pressBootin.getValue() && afterButton.equals("Park Corner")) || (pressOtherBootin.getValue() && !pressBootin.getValue())){
             //goes to second button
-            turnTime(50);// turnTimes more than 45 so we can go straight onto line
-            driveTime(29.8);
-            turnTime(-50);
+            turn(50, 10);// turns more than 45 so we can go straight onto line
+            driveStraight(29.8, 10);
+            turn(-50, 10);
             detectLine();
             beacon2();
         }
-        else{
+        else if (pressBootin.getValue()){
             //press button 1
-            driveTime(-24);
-            turnTime(90);
-            driveTime(48);
-            turnTime(-90);//faces buttons
+            driveStraight(-9, 10);
+            turn(45, 10);
+            driveStraight(55, 10);
+            turn(-90, 10);//faces buttons
             neitherFork();
         }
     }
     private void neitherFork(){
         if (pressBootin.getValue()){
-            driveTime(15);//gets close to button
+            driveStraight(15, 10);//gets close to button
             detectLine();
             beacon1();
         }
         else if(pressOtherBootin.getValue()){
-            driveTime(63);//goes past first button and close to next one
+            driveStraight(63, 10);//goes past first button and close to next one
             detectLine();
             beacon2();
         }
     }
     private void cornerFork(){
         if (pressBootin.getValue() || pressOtherBootin.getValue()){//go hit the buttons
-            driveTime(-17);//backs up off the ramp
-            turnTime(-90);//faces button
-            driveTime(17);
-            turnTime(-45);//straightens for button
+            driveStraight(-20, 10);//backs up off the ramp
+            turn(-45, 10);//faces button
+            driveStraight(17, 10);
+            turn(-45, 10);//straightens for button
             neitherFork();
         }
 
     }
     private void beacon1(){
         if (pressOtherBootin.getValue()){
-            driveTime(-6);
-            turnTime(-90);
-            driveTime(42);
+            driveStraight(-6, 10);
+            turn(-90, 10);
+            driveStraight(42, 10);
             detectLine();
             beacon2();
         }
         else if(afterButton.getValue().equals("Park Corner")){
-            driveTime(-6);
-            turnTime(90);
-            driveTime(17);
-            turnTime(45);
-            driveTime(17);
-            turnTime(-90);
-            driveTime(17);
+            driveStraight(-6, 10);
+            turn(90, 10);
+            driveStraight(17, 10);
+            turn(45, 10);
+            driveStraight(17, 10);
+            turn(-90, 10);
+            driveStraight(17, 10);
             robot.harvester.setPower(-.8);
             nap(2000);//waits for us to score in corner goal
         }
     }
     private void beacon2(){
-        driveTime(-6);
+        driveStraight(-6, 10);
         if((pressOtherBootin.getValue() && pressBootin.getValue() && afterButton.equals("Park Corner"))){
             //hit b1, then go corner
-            turnTime(90);//goes to first beacon
+            turn(90, 10);//goes to first beacon
             detectLine();
             beacon1();
         }
         else if(afterButton.getValue().equals("Park Corner")){
-            turnTime(90);
-            driveTime(48);//goes to first beacon
-            driveTime(17);
-            turnTime(45);
-            driveTime(17);
-            turnTime(-90);
-            driveTime(17);
+            turn(90, 10);
+            driveStraight(48, 10);//goes to first beacon
+            driveStraight(17, 10);
+            turn(45, 10);
+            driveStraight(17, 10);
+            turn(-90, 10);
+            driveStraight(17, 10);
             robot.harvester.setPower(-.8);
             nap(2000);//waits for us to score in corner goal
         }
         else if(afterButton.getValue().equals("Block")){
-            turnTime(-158);
-            driveTime(132);
+            turn(-158, 10);
+            driveStraight(132, 10);
         }
 
     }
