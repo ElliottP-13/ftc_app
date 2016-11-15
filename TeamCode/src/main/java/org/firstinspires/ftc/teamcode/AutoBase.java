@@ -202,7 +202,7 @@ public class AutoBase extends LinearOpMode {
         return array;
     }
 
-    private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed, boolean equalize) {//change to calc timeout
+    private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed, boolean driveStraight) {//change to calc timeout
         robot.leftMotor.setTargetPosition(LtargetPos);
         robot.rightMotor.setTargetPosition(RtargetPos);
 
@@ -222,7 +222,7 @@ public class AutoBase extends LinearOpMode {
                 (robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) &&
                 !passedTarget) {
             int delta = Math.abs(robot.leftMotor.getCurrentPosition() - robot.rightMotor.getCurrentPosition());
-            if ((delta > 10) && equalize) {
+            if ((delta > 10) && driveStraight) {
                 if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(robot.rightMotor.getCurrentPosition())) {
                     robot.leftMotor.setPower(robot.leftMotor.getPower() - .01);
                 } else if (Math.abs(robot.leftMotor.getCurrentPosition()) < Math.abs(robot.rightMotor.getCurrentPosition())) {
@@ -232,15 +232,28 @@ public class AutoBase extends LinearOpMode {
                     robot.rightMotor.setPower(Math.abs(speed));
                 }
             }
-
-            // Display it for the driver.
+            if(driveStraight){
+                passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) ||
+                       (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
+            }
+            else{//it is a turn so we can make sure both have made it.
+                if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)){
+                    robot.leftMotor.setPower(0);//turns it off since we are passed the target   
+                }
+                if (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos)){
+                    robot.rightMotor.setPower(0);//turns it off since we are passed the target   
+                }
+                passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) &&
+                       (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
+            }
+                        // Display it for the driver.
             telemetry.addData("Path1", "Running to %7d :%7d", LtargetPos, RtargetPos);
             telemetry.addData("Path2", "Running at %7d :%7d",
                     robot.leftMotor.getCurrentPosition(),
                     robot.rightMotor.getCurrentPosition());
             telemetry.update();
-            passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) ||
-                    (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
+            
+            //sleep(500); //so we have time to read the telemetry
         }
 
         // Stop all motion;
