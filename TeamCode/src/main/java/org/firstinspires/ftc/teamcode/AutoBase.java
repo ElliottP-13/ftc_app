@@ -14,7 +14,7 @@ public class AutoBase extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
 
     static final double countsPerInch = 89.174;
-    static final double countsPerDegree = 14.9;
+    static final double countsPerDegree = 15.88;
     static final double driveSpeed = 0.7;
     static final double turnSpeed = 0.5;
     static final double miliPerInch = 52.57;
@@ -67,6 +67,7 @@ public class AutoBase extends LinearOpMode {
             rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             runEncoder(leftTarget, rightTarget, timeoutS, speed, false);
         }
+
     }
 
     public void driveTime(double inches) {
@@ -214,7 +215,6 @@ public class AutoBase extends LinearOpMode {
         runtime.reset();
         robot.leftMotor.setPower(Math.abs(speed));
         robot.rightMotor.setPower(Math.abs(speed));
-
         // keep looping while we are still active, and there is time left, and both motors are running.
         boolean passedTarget = false;
         while (opModeIsActive() &&
@@ -222,7 +222,10 @@ public class AutoBase extends LinearOpMode {
                 (robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) &&
                 !passedTarget) {
             int delta = Math.abs(robot.leftMotor.getCurrentPosition() - robot.rightMotor.getCurrentPosition());
-            if ((delta > 10) && driveStraight) {
+            if(driveStraight){
+                robot.rightMotor.setPower(robot.rightMotor.getPower() - .1);
+            }
+            /*if ((delta > 10) && driveStraight) {
                 if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(robot.rightMotor.getCurrentPosition())) {
                     robot.leftMotor.setPower(robot.leftMotor.getPower() - .01);
                 } else if (Math.abs(robot.leftMotor.getCurrentPosition()) < Math.abs(robot.rightMotor.getCurrentPosition())) {
@@ -231,20 +234,14 @@ public class AutoBase extends LinearOpMode {
                     robot.leftMotor.setPower(Math.abs(speed));
                     robot.rightMotor.setPower(Math.abs(speed));
                 }
-            }
+            }*/
             if(driveStraight){
                 passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) ||
                        (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
             }
             else{//it is a turn so we can make sure both have made it.
-                if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)){
-                    robot.leftMotor.setPower(0);//turns it off since we are passed the target   
-                }
-                if (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos)){
-                    robot.rightMotor.setPower(0);//turns it off since we are passed the target   
-                }
-                passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) &&
-                       (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
+                //passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) &&
+                  //     (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
             }
                         // Display it for the driver.
             telemetry.addData("Path1", "Running to %7d :%7d", LtargetPos, RtargetPos);

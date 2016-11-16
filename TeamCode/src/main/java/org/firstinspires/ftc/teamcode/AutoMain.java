@@ -55,6 +55,7 @@ public class AutoMain extends AutoBase{
                 print("go Corner");
                 driveStraight(20, 10);
                 turn(90, 10);
+                sleep(10000);
                 driveStraight(47, 10);//goes to corner ****Needs Adjustments so Straight On***
                 turn(45, 10);
                 driveStraight(37, 10);
