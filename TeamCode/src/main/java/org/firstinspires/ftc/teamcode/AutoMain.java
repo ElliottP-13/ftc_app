@@ -54,13 +54,13 @@ public class AutoMain extends AutoBase{
             else if (start.getValue().equals("Go Corner")){
                 print("go Corner");
                 driveStraight(20, 10);
-                turn(90, 10);
-                sleep(10000);
-                driveStraight(47, 10);//goes to corner ****Needs Adjustments so Straight On***
-                turn(45, 10);
+                turn(90, 10);//should be 90, but its dumb
+                driveStraight(55, 10);
+                turn(50, 10);//also dumb, should be 45
                 driveStraight(37, 10);
                 robot.harvester.setPower(-.8);
                 nap(2000);//waits for us to score in corner goal
+                robot.harvester.setPower(0);
                 cornerFork();
             }
             else {//do neither fork

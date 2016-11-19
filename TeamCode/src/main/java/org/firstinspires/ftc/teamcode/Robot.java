@@ -39,6 +39,9 @@ public class Robot{
         drive = leftMotor.getController();
         volts = map.voltageSensor.get("drive").getVoltage();
 
+        scanner.setPosition(.95);//initalize
+        sensor.enableLed(false);
+
     }
     public double checkVoltage(){
         volts = map.voltageSensor.get("drive").getVoltage();

@@ -23,6 +23,12 @@ public class Tele extends LinearOpMode {
         runtime.reset();
 
         boolean backwards = false;
+        boolean aPressed = false;
+        boolean bPressed = false;
+        boolean xPressed = false;
+        boolean yPressed = false;
+        boolean rBumper = false;
+        boolean lBumper = false;
         while (opModeIsActive()) {//runs until the end
             //drive
             if(backwards){
@@ -37,6 +43,49 @@ public class Tele extends LinearOpMode {
             //shooter
             //clip(bot.shooter, gamepad2.right_stick_y, 1);
 
+            if (gamepad2.left_bumper && !lBumper) {
+                lBumper = true;
+                bot.scanner.setPosition(.20);
+            } else {
+                lBumper = gamepad2.left_bumper;
+            }
+
+            if (gamepad2.right_bumper && !rBumper) {
+                rBumper = true;
+                bot.scanner.setPosition(.45);//aims a bit high
+            } else {
+                rBumper = gamepad2.left_bumper;
+            }
+
+            if (gamepad2.a && !aPressed) {
+                aPressed = true;
+                bot.scanner.setPosition(bot.scanner.getPosition() + .05);
+            } else {
+                aPressed = gamepad2.a;
+            }
+            
+            if (gamepad2.b && !bPressed) {
+                bPressed = true;
+                bot.scanner.setPosition(bot.scanner.getPosition() - .05);
+            } else {
+                bPressed = gamepad2.b;
+            }
+
+            if (gamepad2.x && !xPressed) {
+                xPressed = true;
+                bot.scanner.setPosition(bot.scanner.getPosition() + .10);
+            } else {
+                xPressed = gamepad2.x;
+            }
+
+            if (gamepad2.y && !yPressed) {
+                yPressed = true;
+                bot.scanner.setPosition(bot.scanner.getPosition() - .10);
+            } else {
+                yPressed = gamepad2.y;
+            }
+            telemetry.addLine("" + bot.scanner.getPosition());
+            telemetry.update();
         }
 
     }
