@@ -25,7 +25,7 @@ public class AutoBase extends LinearOpMode {
     AutonomousTextOption allianceColor = new AutonomousTextOption("Alliance Color", "Blue", new String[]{"Blue", "Red"});
     AutonomousTextOption startPosition = new AutonomousTextOption("Start Position", "One", new String[]{"One", "Two"});
     AutonomousIntOption waitStart = new AutonomousIntOption("Wait at Start", 0, 0, 20);
-    AutonomousTextOption start = new AutonomousTextOption("Hit Cap Ball", "Hit Cap", new String[]{"Hit Cap", "Go Corner", "Neither"});
+    AutonomousTextOption start = new AutonomousTextOption("Start Strategy", "Hit Cap", new String[]{"Hit Cap", "Go Corner", "Neither"});
     AutonomousBooleanOption pressBootin = new AutonomousBooleanOption("Bootin Press", true);
     AutonomousBooleanOption pressOtherBootin = new AutonomousBooleanOption("Bootin 2 Press", true);
     AutonomousTextOption afterButton = new AutonomousTextOption("After Button", "Park Corner", new String[]{"Park Corner", "Block"});

@@ -24,16 +24,18 @@ public class Tele extends LinearOpMode {
 
         boolean backwards = false;
         boolean aPressed = false;
+        boolean a1Pressed = false;
         boolean bPressed = false;
         boolean xPressed = false;
         boolean yPressed = false;
         boolean rBumper = false;
         boolean lBumper = false;
+        boolean slow = false;
         while (opModeIsActive()) {//runs until the end
             //drive
-            if(backwards){
-                bot.rightMotor.setPower(gamepad1.right_stick_y);//drive backwards
-                bot.leftMotor.setPower(gamepad1.left_stick_y);
+            if(slow){
+                bot.rightMotor.setPower((-gamepad1.right_stick_y) / 1.5);
+                bot.leftMotor.setPower((-gamepad1.right_stick_y) / 1.5);
             } else {
                 bot.rightMotor.setPower(-gamepad1.right_stick_y);//drive
                 bot.leftMotor.setPower(-gamepad1.left_stick_y);
@@ -42,7 +44,12 @@ public class Tele extends LinearOpMode {
             clip(bot.harvester, gamepad2.left_stick_y, 0.5);
             //shooter
             //clip(bot.shooter, gamepad2.right_stick_y, 1);
-
+            if (gamepad1.a && !a1Pressed) {//slows it down for bubb
+                a1Pressed = true;
+                slow = !slow    ;
+            } else {
+                a1Pressed = gamepad1.a;
+            }
             if (gamepad2.left_bumper && !lBumper) {
                 lBumper = true;
                 bot.scanner.setPosition(.20);

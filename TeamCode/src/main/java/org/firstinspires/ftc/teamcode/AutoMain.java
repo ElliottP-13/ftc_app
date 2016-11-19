@@ -10,9 +10,12 @@ public class AutoMain extends AutoBase{
     @Override
     public void runOpMode() {
         initialize(hardwareMap);
+        selectOptions();
         waitForStart();
-        allianceColor.setValue("Blue"); waitStart.setValue(0); start.setValue("Go Corner"); pressBootin.setValue(true);
-        pressOtherBootin.setValue(true); afterButton.setValue("Park Corner");
+        if (allianceColor.getValue().equals("Red")) {
+            directonAdjust = -1.0;
+        }
+        sleep((long) waitStart.getValue());
         startFork();
     }
     private void startFork(){
@@ -43,12 +46,12 @@ public class AutoMain extends AutoBase{
                 neitherFork();
             }
         }
-        //start position one
+        //**************************start position one *************************************
         else {
             if (start.getValue().equals("Hit Cap")){
-                driveStraight(10, 10);//DeCapps
+                driveStraight(5.5, 10);//DeCapps
                 turn(45, 10);
-                driveStraight(45, 10);
+                driveStraight(57, 10);
                 capFork();
             }
             else if (start.getValue().equals("Go Corner")){
@@ -91,6 +94,15 @@ public class AutoMain extends AutoBase{
             turn(-90, 10);//faces buttons
             neitherFork();
         }
+        else {//park in the corner
+            print("Cap Fork Corner");
+            turn(113, 10);
+            driveStraight(65, 10);
+            robot.harvester.setPower(-.8);
+            sleep(2000);
+            robot.harvester.setPower(0);
+            //capFork();
+        }
     }
     private void neitherFork(){
         if (pressBootin.getValue()){
@@ -105,13 +117,14 @@ public class AutoMain extends AutoBase{
         }
     }
     private void cornerFork(){
-        if (pressBootin.getValue() || pressOtherBootin.getValue()){//go hit the buttons
+        //we can't back up so just stop
+        /*if (pressBootin.getValue() || pressOtherBootin.getValue()){//go hit the buttons
             driveStraight(-20, 10);//backs up off the ramp
             turn(-45, 10);//faces button
             driveStraight(17, 10);
             turn(-45, 10);//straightens for button
             neitherFork();
-        }
+        }*/
 
     }
     private void beacon1(){
