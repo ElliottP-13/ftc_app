@@ -46,12 +46,6 @@ public class DemoTele extends LinearOpMode {
             clip(bot.harvester, gamepad2.left_stick_y, 0.5);
             //shooter
             //clip(bot.shooter, gamepad2.right_stick_y, 1);
-            if (gamepad1.a && !a1Pressed) {//slows it down for bubb
-                a1Pressed = true;
-                slow = !slow    ;
-            } else {
-                a1Pressed = gamepad1.a;
-            }
             if (gamepad2.left_bumper && !lBumper) {
                 lBumper = true;
                 bot.scanner.setPosition(.20);
