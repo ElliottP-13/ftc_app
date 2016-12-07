@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 /**
- * Created by Elliott on 10/31/2016.
+ * Created by Elliott on 12/07/2016.
  */
-public class Robot{
+public class DemoRobot{
     HardwareMap map;
     DcMotor leftMotor;
     DcMotor rightMotor ;
@@ -25,7 +25,7 @@ public class Robot{
     LightSensor lineSensor;
     double volts;
     DcMotorController  drive;
-    public Robot(HardwareMap HMap){
+    public DemoRobot(HardwareMap HMap){
         // Save reference to Hardware map
         map = HMap;
 
@@ -35,10 +35,6 @@ public class Robot{
         rightMotor = map.dcMotor.get("Right Drive");
         sideways = map.dcMotor.get("Sideways");
         harvester = map.dcMotor.get("Harvester");
-        //shooter = hardwareMap.dcMotor.get("Shooter");
-        scanner = map.servo.get("Scanner");
-        sensor = map.colorSensor.get("Sensor");
-        lineSensor = map.lightSensor.get("Line Sensor");
         drive = leftMotor.getController();
         volts = map.voltageSensor.get("drive").getVoltage();
 
