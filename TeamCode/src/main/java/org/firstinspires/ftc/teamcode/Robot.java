@@ -16,8 +16,10 @@ public class Robot{
     HardwareMap map;
     DcMotor leftMotor;
     DcMotor rightMotor ;
+    DcMotor sideways;
     DcMotor harvester;
     DcMotor shooter;
+
     Servo scanner;
     ColorSensor sensor;
     LightSensor lineSensor;
@@ -31,6 +33,7 @@ public class Robot{
         leftMotor = map.dcMotor.get("Left Drive");
         rightMotor = map.dcMotor.get("Right Drive");
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
+        sideways = map.dcMotor.get("Sideways");
         harvester = map.dcMotor.get("Harvester");
         //shooter = hardwareMap.dcMotor.get("Shooter");
         scanner = map.servo.get("Scanner");

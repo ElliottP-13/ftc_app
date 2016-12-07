@@ -9,9 +9,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  * Created by Elliott on 11/3/2016.
  */
-@TeleOp(name="Tele", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name="Demo", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class Tele extends LinearOpMode {
+public class DemoTele extends LinearOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -32,14 +32,6 @@ public class Tele extends LinearOpMode {
         boolean lBumper = false;
         boolean slow = false;
         while (opModeIsActive()) {//runs until the end
-            //drive
-            if(slow){
-                bot.rightMotor.setPower((-gamepad1.right_stick_y) / 1.5);
-                bot.leftMotor.setPower((-gamepad1.right_stick_y) / 1.5);
-            } else {
-                bot.rightMotor.setPower(-gamepad1.right_stick_y);//drive
-                bot.leftMotor.setPower(-gamepad1.left_stick_y);
-            }
             if(gamepad1.right_bumper){
                 bot.sideways.setPower(.5);
             }
@@ -80,7 +72,7 @@ public class Tele extends LinearOpMode {
             } else {
                 aPressed = gamepad2.a;
             }
-            
+
             if (gamepad2.b && !bPressed) {
                 bPressed = true;
                 bot.scanner.setPosition(bot.scanner.getPosition() - .05);
@@ -108,7 +100,7 @@ public class Tele extends LinearOpMode {
     }
     private void clip(DcMotor motor, float stickValue, double power){
         if(stickValue >= .25){
-           motor.setPower(power);//sets constants so that it isn't too touchy
+            motor.setPower(power);//sets constants so that it isn't too touchy
         }
         else if(stickValue <= -.25){
             motor.setPower(-power);//sets constants so that it isn't too touchy
