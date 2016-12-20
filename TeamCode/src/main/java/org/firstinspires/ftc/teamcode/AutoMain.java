@@ -33,7 +33,7 @@ public class AutoMain extends AutoBase {
                     driveStraight(25, 10);//goes to corner ****Needs Adjustments so Straight On***
                     turn(90, 10);
                     driveStraight(24, 10);
-                    robot.harvester.setPower(-.8);
+                    //robot.harvester.setPower(-.8);
                     nap(2000);//waits for us to score in corner goal
                     cornerFork();
                 } else {
@@ -61,9 +61,9 @@ public class AutoMain extends AutoBase {
                     driveStraight(55, 10);
                     turn(50, 10);//also dumb, should be 45
                     driveStraight(37, 10);
-                    robot.harvester.setPower(-.8);
+                   // robot.harvester.setPower(-.8);
                     nap(2000);//waits for us to score in corner goal
-                    robot.harvester.setPower(0);
+                    //robot.harvester.setPower(0);
                     cornerFork();
                 } else {//do neither fork
                     driveStraight(10, 10);
@@ -98,9 +98,9 @@ public class AutoMain extends AutoBase {
                 print("Cap Fork Corner");
                 turn(101, 10);
                 driveStraight(65, 10);
-                robot.harvester.setPower(-.8);
+             //   robot.harvester.setPower(-.8);
                 nap(2000);
-                robot.harvester.setPower(0);
+               // robot.harvester.setPower(0);
                 //capFork();
             }
         }
@@ -148,7 +148,7 @@ public class AutoMain extends AutoBase {
                 driveStraight(17, 10);
                 turn(-90, 10);
                 driveStraight(17, 10);
-                robot.harvester.setPower(-.8);
+                //robot.harvester.setPower(-.8);
                 nap(2000);//waits for us to score in corner goal
             }
         }
@@ -170,7 +170,7 @@ public class AutoMain extends AutoBase {
                 driveStraight(17, 10);
                 turn(-90, 10);
                 driveStraight(17, 10);
-                robot.harvester.setPower(-.8);
+                //robot.harvester.setPower(-.8);
                 nap(2000);//waits for us to score in corner goal
             } else if (afterButton.getValue().equals("Block")) {
                 turn(-158, 10);

@@ -32,7 +32,7 @@ public class Tele extends LinearOpMode {
         boolean lBumper = false;
         boolean slow = false;
         while (opModeIsActive()) {//runs until the end
-            //drive
+            /*drive
             if(slow){
                 bot.rightMotor.setPower((-gamepad1.right_stick_y) / 1.5);
                 bot.leftMotor.setPower((-gamepad1.right_stick_y) / 1.5);
@@ -103,7 +103,7 @@ public class Tele extends LinearOpMode {
             }
             telemetry.addLine("" + bot.scanner.getPosition());
             telemetry.update();
-        }
+        */}
 
     }
     private void clip(DcMotor motor, float stickValue, double power){

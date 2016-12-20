@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Created by Elliott on 10/31/2016.
  */
 
-public class AutoBase extends LinearOpMode {
+public class AutoBaseV2 extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
 
     static final double countsPerInch = 89.174;
@@ -58,7 +58,7 @@ public class AutoBase extends LinearOpMode {
     }
 
     public void driveTime(double inches) {
-        /*if (opModeIsActive()) {
+        if (opModeIsActive()) {
             runtime.reset();
             double Rpower = 1;
             double Lpower = Rpower - .01;
@@ -75,22 +75,26 @@ public class AutoBase extends LinearOpMode {
                 Lpower *= -1;
                 Rpower *= -1;
             }
-            robot.leftMotor.setPower(Lpower);
-            robot.rightMotor.setPower(Rpower);
+            robot.leftFront.setPower(Lpower);
+            robot.leftBack.setPower(Lpower);
+            robot.rightFront.setPower(Rpower);
+            robot.rightBack.setPower(Rpower);
             while ((runtime.milliseconds() < ((miliPerInch * Math.abs(inches)) + voltAjust * robot.checkVoltage())) && opModeIsActive()) {
                 //do nothing because we are waiting for it to finish
                 telemetry.addLine("Running to: " + (miliPerInch * inches) + voltAjust * robot.checkVoltage());
                 telemetry.addLine("Currently at: " + runtime.milliseconds());
                 telemetry.update();
             }
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
+            robot.leftFront.setPower(0);
+            robot.leftBack.setPower(0);
+            robot.rightFront.setPower(0);
+            robot.rightBack.setPower(0);
             sleep(125);
-        }*/
+        }
     }
 
     public void turnTime(double degrees) {
-        /*double voltAdjust = 0;
+        double voltAdjust = 0;
         if (robot.checkVoltage() + voltChange <= 12.05) {
             print("low power");
             voltAdjust = 0.293;
@@ -101,79 +105,110 @@ public class AutoBase extends LinearOpMode {
         }
         runtime.reset();
         if (degrees > 0) {//turn right
-            robot.leftMotor.setPower(.7);
-            robot.rightMotor.setPower(-.7);
+            robot.leftFront.setPower(.7);
+            robot.leftBack.setPower(.7);
+            robot.rightFront.setPower(-.7);
+            robot.rightBack.setPower(-.7);
         }
         if (degrees < 0) {//turn left
-            robot.leftMotor.setPower(-.7);
-            robot.rightMotor.setPower(.7);
+            robot.leftFront.setPower(-.7);
+            robot.leftBack.setPower(-.7);
+            robot.rightFront.setPower(.7);
+            robot.rightBack.setPower(.7);
         }
         while ((runtime.milliseconds() < (miliPerDegree * Math.abs(degrees)) + voltAdjust * robot.checkVoltage()) && opModeIsActive()) {
             //does nothing because we are waiting for it to finish
         }
-        robot.leftMotor.setPower(0);
-        robot.rightMotor.setPower(0);
-        sleep(125);*/
+        robot.leftFront.setPower(0);
+        robot.leftBack.setPower(0);
+        robot.rightFront.setPower(0);
+        robot.rightBack.setPower(0);
+        sleep(125);
     }
     public void turn(double speed, double degrees, double timeoutS) {//defaults right, turn left w/ -degrees
-        /*int leftTarget = robot.leftMotor.getCurrentPosition();
-        int rightTarget = robot.rightMotor.getCurrentPosition();
+        int Lfront = robot.leftFront.getCurrentPosition();
+        int Lback = robot.leftBack.getCurrentPosition();
+        int Rfront = robot.rightFront.getCurrentPosition();
+        int Rback = robot.rightBack.getCurrentPosition();
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
             // Determine new target position, and pass to motor controller
-            leftTarget = robot.leftMotor.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
-            rightTarget = robot.rightMotor.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
+            Lfront = robot.leftFront.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
+            Lback = robot.leftBack.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
+            Rfront = robot.rightFront.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
+            Rback = robot.rightBack.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             //runEncoder(leftTarget, rightTarget, timeoutS, speed, false);
         }
-        robot.leftMotor.setTargetPosition(leftTarget * 2);
-        robot.rightMotor.setTargetPosition(rightTarget);
+        robot.leftFront.setTargetPosition(Lfront);
+        robot.leftBack.setTargetPosition(Lback);
+        robot.rightFront.setTargetPosition(Rfront);
+        robot.rightBack.setTargetPosition(Rback);
 
         // Turn On RUN_TO_POSITION
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // reset the timeout time and start motion.
         runtime.reset();
-        robot.leftMotor.setPower(Math.abs(speed));
-        robot.rightMotor.setPower(Math.abs(speed));
+        robot.leftFront.setPower(Math.abs(speed));
+        robot.leftBack.setPower(Math.abs(speed));
+        robot.rightFront.setPower(Math.abs(speed));
+        robot.rightBack.setPower(Math.abs(speed));
 
         // keep looping while we are still active, and there is time left, and both motors are running.
         while (opModeIsActive() &&
                 (runtime.seconds() < timeoutS) &&
-                (robot.leftMotor.isBusy() && robot.rightMotor.isBusy())) {
+                (robot.leftFront.isBusy() && robot.leftBack.isBusy()) &&
+                (robot.rightFront.isBusy() && robot.rightBack.isBusy())) {
 
             // Display it for the driver.
-            telemetry.addData("Path1",  "Running to %7d :%7d", leftTarget,  rightTarget);
-            telemetry.addData("Path2",  "Running at %7d :%7d",
-                    robot.leftMotor.getCurrentPosition(),
-                    robot.rightMotor.getCurrentPosition());
+            telemetry.addData("Front",  "Running to %7d :%7d", Lfront,  Rfront);
+            telemetry.addData("Back",  "Running to %7d :%7d", Lback,  Rback);
+            telemetry.addData("front 2",  "Running at %7d :%7d",
+                    robot.leftFront.getCurrentPosition(),
+                    robot.rightFront.getCurrentPosition());
+            telemetry.addData("back 2",  "Running at %7d :%7d",
+                    robot.leftBack.getCurrentPosition(),
+                    robot.rightBack.getCurrentPosition());
             telemetry.update();
         }
 
         // Stop all motion;
-        robot.leftMotor.setPower(0);
-        robot.rightMotor.setPower(0);
+        robot.leftFront.setPower(0);
+        robot.leftBack.setPower(0);
+        robot.rightFront.setPower(0);
+        robot.rightBack.setPower(0);
 
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         idle();
         // Turn off RUN_TO_POSITION
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
+        robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     public void driveStraight(double speed, double inches, double timeoutS) {//**make a calc timeout**
-        /*int leftTarget;
-        int rightTarget;
+        int lFront;
+        int lBack;
+        int rFront;
+        int rBack;
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            leftTarget = Math.abs(robot.leftMotor.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);// goes 1 less for roll over
-            rightTarget = Math.abs(robot.rightMotor.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);
-            runEncoder(leftTarget, rightTarget, timeoutS, speed, true);
-        }*/
+            lFront = Math.abs(robot.leftFront.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);// goes 1 less for roll over
+            lBack = Math.abs(robot.leftBack.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);
+            rFront = Math.abs(robot.rightFront.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);// goes 1 less for roll over
+            rBack = Math.abs(robot.rightBack.getCurrentPosition()) + (int) ((inches - 1) * countsPerInch);
+            runEncoder(lFront, lBack, rFront, rBack, timeoutS, speed, true);
+        }
     }
     public void driveSideways(double inches, double timeoutS){
         /*double speed = .25;
@@ -206,136 +241,71 @@ public class AutoBase extends LinearOpMode {
             //sleep(500); //so we have time to read the telemetry
         }*/
     }
-    public void detectLine() {
-        /*while ((robot.lineSensor.getRawLightDetected() < 120) && opModeIsActive()) {//loops through until we see the line
-            robot.leftMotor.setPower(.5);
-            robot.rightMotor.setPower(.5);
-        }
 
-        print("Found Line!");
-        robot.leftMotor.setPower(0);
-        robot.rightMotor.setPower(0);
-        turn(90, 5);//turns right
-        //hopefully we are right in front of beacon
-        scanSensors();//we see the button.*/
-    }
-
-    public void scanSensors() {//scans at 3 different angles so we get a better idea of what it is
-        /*int[][] values = new int[3][3];
-        robot.scanner.setPosition(.25);
-        values = putValues(values, 0);//puts them all in the array so i can look at them later and compare
-        robot.scanner.setPosition(.5);
-        values = putValues(values, 1);//hopefully i don't lose my previously stored info
-        robot.scanner.setPosition(.75);
-        values = putValues(values, 2);
-
-        //calculate
-        int sumRed = 0;
-        for (int i = 0; i < values.length; i++) {
-            sumRed += values[i][0];//adds all of the values together
-        }
-        int sumBlue = 0;
-        for (int i = 0; i < values.length; i++) {
-            sumBlue += values[i][2];
-        }
-        if (sumBlue > sumRed) {
-            //its blue
-            print("Its Blue");
-        } else if (sumRed > sumBlue) {
-            //its red
-            print("Its red");
-        } else {
-            //something went wrong, lets try again
-            //maybe move forward or backwards?
-            scanSensors();
-        }
-        */
-    }
-
-    private int[][] putValues(int[][] array, int scanNum) {
-        /*array[scanNum][0] = robot.sensor.red();
-        array[scanNum][1] = robot.sensor.green();
-        array[scanNum][2] = robot.sensor.blue();
-        */
-        return array;
-    }
-
-    private void runEncoder(int LtargetPos, int RtargetPos, double timeoutS, double speed, boolean driveStraight) {//change to calc timeout
-        /*if(!opModeIsActive()){
+    private void runEncoder(int Lfront, int Lback, int Rfront, int Rback, double timeoutS, //change to calc timeout
+                            double speed, boolean driveStraight) {
+        if (!opModeIsActive()) {
             stop();
         }
-        if(isStopRequested()){
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
+        if (isStopRequested()) {
+            robot.leftBack.setPower(0);
+            robot.leftFront.setPower(0);
+            robot.rightBack.setPower(0);
+            robot.rightFront.setPower(0);
         } else {
-            robot.leftMotor.setTargetPosition(-LtargetPos);//because it was going backwards for some stuipid reason
-            robot.rightMotor.setTargetPosition(-RtargetPos);
+            robot.leftFront.setTargetPosition(Lfront);
+            robot.leftBack.setTargetPosition(Lback);
+            robot.rightFront.setTargetPosition(Rfront);
+            robot.rightBack.setTargetPosition(Rback);
 
             // Turn On RUN_TO_POSITION
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.leftBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightFront.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightBack.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.leftMotor.setPower(Math.abs(speed));
-            robot.rightMotor.setPower(Math.abs(speed));
+            robot.leftFront.setPower(Math.abs(speed));
+            robot.leftBack.setPower(Math.abs(speed));
+            robot.rightFront.setPower(Math.abs(speed));
+            robot.rightBack.setPower(Math.abs(speed));
+
             // keep looping while we are still active, and there is time left, and both motors are running.
-            boolean passedTarget = false;
-            boolean backwards = (Math.abs(robot.leftMotor.getCurrentPosition()) > LtargetPos) ||
-                    (Math.abs(robot.rightMotor.getCurrentPosition()) > RtargetPos);
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (robot.leftMotor.isBusy() && robot.rightMotor.isBusy()) &&
-                    !passedTarget) {
-                int delta = Math.abs(robot.leftMotor.getCurrentPosition() - robot.rightMotor.getCurrentPosition());
-                if (driveStraight) {
-                    //robot.rightMotor.setPower(Math.abs(speed) - .1);
-                }
-            /*if ((delta > 10) && driveStraight) {
-                if (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(robot.rightMotor.getCurrentPosition())) {
-                    robot.leftMotor.setPower(robot.leftMotor.getPower() - .01);
-                } else if (Math.abs(robot.leftMotor.getCurrentPosition()) < Math.abs(robot.rightMotor.getCurrentPosition())) {
-                    robot.rightMotor.setPower(robot.rightMotor.getPower() - .01);
-                } else {
-                    robot.leftMotor.setPower(Math.abs(speed));
-                    robot.rightMotor.setPower(Math.abs(speed));
-                }
-            }
-                if (driveStraight && !backwards) {
-                    passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > LtargetPos) ||
-                            (Math.abs(robot.rightMotor.getCurrentPosition()) > RtargetPos);
-                }
-                if (driveStraight && backwards) {
-                    telemetry.addLine("BACKWAAAAARDS!");
-                    passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) < LtargetPos) ||
-                            (Math.abs(robot.rightMotor.getCurrentPosition()) < RtargetPos);
-                } else {//it is a turn so we can make sure both have made it.
-                    //passedTarget = (Math.abs(robot.leftMotor.getCurrentPosition()) > Math.abs(LtargetPos)) &&
-                    //     (Math.abs(robot.rightMotor.getCurrentPosition()) > Math.abs(RtargetPos));
-                }
-                // Display it for the driver.
-                telemetry.addData("Path1", "Running to %7d :%7d", LtargetPos, RtargetPos);
-                telemetry.addData("Path2", "Running at %7d :%7d",
-                        robot.leftMotor.getCurrentPosition(),
-                        robot.rightMotor.getCurrentPosition());
-                telemetry.update();
+                    (robot.leftFront.isBusy() && robot.leftBack.isBusy()) &&
+                    (robot.rightFront.isBusy() && robot.rightBack.isBusy())) {
 
-                //sleep(500); //so we have time to read the telemetry
+                // Display it for the driver.
+                telemetry.addData("Front", "Running to %7d :%7d", Lfront, Rfront);
+                telemetry.addData("Back", "Running to %7d :%7d", Lback, Rback);
+                telemetry.addData("front 2", "Running at %7d :%7d",
+                        robot.leftFront.getCurrentPosition(),
+                        robot.rightFront.getCurrentPosition());
+                telemetry.addData("back 2", "Running at %7d :%7d",
+                        robot.leftBack.getCurrentPosition(),
+                        robot.rightBack.getCurrentPosition());
+                telemetry.update();
             }
 
             // Stop all motion;
-            robot.leftMotor.setPower(0);
-            robot.rightMotor.setPower(0);
+            robot.leftFront.setPower(0);
+            robot.leftBack.setPower(0);
+            robot.rightFront.setPower(0);
+            robot.rightBack.setPower(0);
 
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             idle();
             // Turn off RUN_TO_POSITION
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            //  sleep(250);   // optional pause after each move
-        }*/
+            robot.leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
 
     public void selectOptions() {

@@ -11,10 +11,11 @@ public class Calibrate extends AutoBase {
     public void runOpMode() {
         initialize(hardwareMap);
         waitForStart();
-        //driveStraight(48, 30);
-        //turn(45, 30);
-        turn(90, 30);
-        //driveTime(24);
-        //turnTime(45);
+        while(opModeIsActive()) {
+            robot.rightFront.setPower(1);
+            robot.leftFront.setPower(1);
+            robot.rightBack.setPower(1);
+            robot.leftBack.setPower(1);
+        }
     }
 }

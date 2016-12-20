@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -14,37 +15,27 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
  */
 public class Robot{
     HardwareMap map;
-    DcMotor leftMotor;
-    DcMotor rightMotor ;
-    DcMotor sideways;
-    DcMotor harvester;
-    DcMotor shooter;
+    DcMotor rightFront;
+    DcMotor rightBack;
+    DcMotor leftFront;
+    DcMotor leftBack;
 
-    Servo scanner;
-    ColorSensor sensor;
-    LightSensor lineSensor;
+    ColorSensor color;
     double volts;
     DcMotorController  drive;
     public Robot(HardwareMap HMap){
         // Save reference to Hardware map
         map = HMap;
 
-        // Define and Initialize Motors
-        leftMotor = map.dcMotor.get("Left Drive");
-        leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        rightMotor = map.dcMotor.get("Right Drive");
-        sideways = map.dcMotor.get("Sideways");
-        harvester = map.dcMotor.get("Harvester");
-        //shooter = hardwareMap.dcMotor.get("Shooter");
-        scanner = map.servo.get("Scanner");
-        sensor = map.colorSensor.get("Sensor");
-        lineSensor = map.lightSensor.get("Line Sensor");
-        drive = leftMotor.getController();
-        volts = map.voltageSensor.get("drive").getVoltage();
+        rightFront = map.dcMotor.get("right front");
+        rightBack = map.dcMotor.get("right back");
+        leftFront = map.dcMotor.get("left front");
+        leftBack = map.dcMotor.get("left back");
+//elliot sucks bbc
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        scanner.setPosition(.95);//initalize
-        sensor.enableLed(false);
-
+        color = map.colorSensor.get("color");
     }
     public double checkVoltage(){
         volts = map.voltageSensor.get("drive").getVoltage();
