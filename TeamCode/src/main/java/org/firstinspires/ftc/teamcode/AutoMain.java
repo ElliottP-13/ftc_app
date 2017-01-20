@@ -10,13 +10,25 @@ public class AutoMain extends AutoBase {
     @Override
     public void runOpMode() {
         initialize(hardwareMap);
-        selectOptions();
+        //selectOptions();
         waitForStart();
-        if (allianceColor.getValue().equals("Red")) {
+        /*if (allianceColor.getValue().equals("Red")) {
             directonAdjust = -1.0;
-        }
-        nap(waitStart.getValue() * 1000);
-        startFork();
+        }*/
+        //nap(waitStart.getValue() * 1000);
+        //startFork();
+        driveStraight(6, 10);
+        turn(20, 10);
+        //shoot
+        robot.shooter.setPower(.3);
+        nap(5000);
+        robot.shooter.setPower(0);
+        driveStraight(34, 10);
+        turn(60, 10);
+        driveStraight(.7,  50, 10);
+        turn(-90, 10);
+        driveStraight(20, 10);
+        turn(90, 10);
     }
 
     private void startFork() {
@@ -47,7 +59,7 @@ public class AutoMain extends AutoBase {
                 }
 
             }
-            //**************************start position one *************************************
+            /**************************start position one *************************************/
             else {
                 if (start.getValue().equals("Hit Cap")) {
                     driveStraight(5, 10);//DeCapps
@@ -85,7 +97,6 @@ public class AutoMain extends AutoBase {
                 turn(50, 10);// turns more than 45 so we can go straight onto line
                 driveStraight(29.8, 10);
                 turn(-50, 10);
-                detectLine();
                 beacon2();
             } else if (pressBootin.getValue()) {
                 //press button 1
@@ -110,11 +121,9 @@ public class AutoMain extends AutoBase {
         if (opModeIsActive()) {
             if (pressBootin.getValue()) {
                 driveStraight(15, 10);//gets close to button
-                detectLine();
                 beacon1();
             } else if (pressOtherBootin.getValue()) {
                 driveStraight(63, 10);//goes past first button and close to next one
-                detectLine();
                 beacon2();
             }
         }
@@ -138,7 +147,6 @@ public class AutoMain extends AutoBase {
                 driveStraight(-6, 10);
                 turn(-90, 10);
                 driveStraight(42, 10);
-                detectLine();
                 beacon2();
             } else if (afterButton.getValue().equals("Park Corner")) {
                 driveStraight(-6, 10);
@@ -160,7 +168,6 @@ public class AutoMain extends AutoBase {
             if ((pressOtherBootin.getValue() && pressBootin.getValue() && afterButton.equals("Park Corner"))) {
                 //hit b1, then go corner
                 turn(90, 10);//goes to first beacon
-                detectLine();
                 beacon1();
             } else if (afterButton.getValue().equals("Park Corner")) {
                 turn(90, 10);
