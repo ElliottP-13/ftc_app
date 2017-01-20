@@ -19,26 +19,34 @@ public class Robot{
     DcMotor rightBack;
     DcMotor leftFront;
     DcMotor leftBack;
+    DcMotor harvester;
+    DcMotor shooter;
 
     ColorSensor color;
     double volts;
-    DcMotorController  drive;
+    DcMotorController  controller;
     public Robot(HardwareMap HMap){
         // Save reference to Hardware map
         map = HMap;
 
-        rightFront = map.dcMotor.get("right front");
-        rightBack = map.dcMotor.get("right back");
-        leftFront = map.dcMotor.get("left front");
-        leftBack = map.dcMotor.get("left back");
-//elliot sucks bbc
+        rightFront = map.dcMotor.get("Right Front");
+        rightBack = map.dcMotor.get("Right Back");
+        leftFront = map.dcMotor.get("Left Front");
+        leftBack = map.dcMotor.get("Left Back");
+
+        harvester = map.dcMotor.get("Harvester");
+        shooter = map.dcMotor.get("Shooter");
+
+        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
+
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        controller = map.dcMotorController.get("left");
         color = map.colorSensor.get("color");
     }
     public double checkVoltage(){
-        volts = map.voltageSensor.get("drive").getVoltage();
+        volts = map.voltageSensor.get("left").getVoltage();
         return volts;
     }
 
