@@ -19,7 +19,7 @@ public class AutoBase extends LinearOpMode {
     static final double countsPerDegree = 3.25;
     static final double voltSlide = 4;
     static final double driveSpeed = 0.3;
-    static final double turnSpeed = 0.5;
+    static final double turnSpeed = 1.0;
     static final double miliPerInch = 55.8556;
     static final double miliPerDegree = 8.366;
     static final double voltChange = 0.7;
@@ -77,9 +77,7 @@ public class AutoBase extends LinearOpMode {
                 Lpower *= -1;
                 Rpower *= -1;
             }
-            robot.leftFront.setPower(Lpower);
             robot.leftBack.setPower(Lpower);
-            robot.rightFront.setPower(Rpower);
             robot.rightBack.setPower(Rpower);
             while ((runtime.milliseconds() < ((miliPerInch * Math.abs(inches)) + voltAjust * robot.checkVoltage())) && opModeIsActive()) {
                 //do nothing because we are waiting for it to finish
@@ -87,9 +85,7 @@ public class AutoBase extends LinearOpMode {
                 telemetry.addLine("Currently at: " + runtime.milliseconds());
                 telemetry.update();
             }
-            robot.leftFront.setPower(0);
             robot.leftBack.setPower(0);
-            robot.rightFront.setPower(0);
             robot.rightBack.setPower(0);
             sleep(125);
         }
@@ -107,38 +103,28 @@ public class AutoBase extends LinearOpMode {
         }
         runtime.reset();
         if (degrees > 0) {//turn right
-            robot.leftFront.setPower(.7);
             robot.leftBack.setPower(.7);
-            robot.rightFront.setPower(-.7);
             robot.rightBack.setPower(-.7);
         }
         if (degrees < 0) {//turn left
-            robot.leftFront.setPower(-.7);
             robot.leftBack.setPower(-.7);
-            robot.rightFront.setPower(.7);
             robot.rightBack.setPower(.7);
         }
         while ((runtime.milliseconds() < (miliPerDegree * Math.abs(degrees)) + voltAdjust * robot.checkVoltage()) && opModeIsActive()) {
             //does nothing because we are waiting for it to finish
         }
-        robot.leftFront.setPower(0);
         robot.leftBack.setPower(0);
-        robot.rightFront.setPower(0);
         robot.rightBack.setPower(0);
         sleep(125);
     }
     public void turn(double speed, double degrees, double timeoutS) {//defaults right, turn left w/ -degrees
-        int Lfront = robot.leftFront.getCurrentPosition();
         int Lback = robot.leftBack.getCurrentPosition();
-        int Rfront = robot.rightFront.getCurrentPosition();
         int Rback = robot.rightBack.getCurrentPosition();
 
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
             // Determine new target position, and pass to motor controller
-            Lfront = robot.leftFront.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
             Lback = robot.leftBack.getCurrentPosition() + (int) (degrees * countsPerDegree * directonAdjust);
-            Rfront = robot.rightFront.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             Rback = robot.rightBack.getCurrentPosition() - (int) (degrees * countsPerDegree * directonAdjust);
             //runEncoder(leftTarget, rightTarget, timeoutS, speed, false);
         }
@@ -147,19 +133,17 @@ public class AutoBase extends LinearOpMode {
         boolean rdir = true;
         int lAdjust = 1;
         boolean ldir = true;
-        if(robot.rightFront.getCurrentPosition() > Rfront){//needs to go backwards
+        if(robot.rightBack.getCurrentPosition() > Rback){//needs to go backwards
             rAdjust *= -1;
             rdir = false;
         }
-        if(robot.leftFront.getCurrentPosition() > Lfront){//needs to go backwards
+        if(robot.leftBack.getCurrentPosition() > Lback){//needs to go backwards
             lAdjust *= -1;
             ldir = false;
         }
         for(int i = 0; i <= speed * 10; i++){
             double power = i * .1;
-            robot.rightFront.setPower(power * rAdjust);
             robot.rightBack.setPower(power * rAdjust);
-            robot.leftFront.setPower(power * lAdjust);
             robot.leftBack.setPower(power * lAdjust);
         }
         // keep looping while we are still active, and there is time left, and both motors are running.
@@ -169,11 +153,8 @@ public class AutoBase extends LinearOpMode {
                         checkDistance(Rback, robot.rightBack, rdir))) {
 
             // Display it for the driver.
-            telemetry.addData("Front",  "Running to %7d :%7d", Lfront,  Rfront);
             telemetry.addData("Back",  "Running to %7d :%7d", Lback,  Rback);
-            telemetry.addData("front 2",  "Running at %7d :%7d",
-                    robot.leftFront.getCurrentPosition(),
-                    robot.rightFront.getCurrentPosition());
+
             telemetry.addData("back 2",  "Running at %7d :%7d",
                     robot.leftBack.getCurrentPosition(),
                     robot.rightBack.getCurrentPosition());
@@ -181,9 +162,7 @@ public class AutoBase extends LinearOpMode {
         }
 
         // Stop all motion;
-        robot.leftFront.setPower(0);
         robot.leftBack.setPower(0);
-        robot.rightFront.setPower(0);
         robot.rightBack.setPower(0);
 
     }
@@ -197,53 +176,41 @@ public class AutoBase extends LinearOpMode {
         if (opModeIsActive()) {
 
             // Determine new target position, and pass to motor controller
-            lFront = Math.abs(robot.leftFront.getCurrentPosition()) + (int) (inches * countsPerInch);// goes 1 less for roll over
+
             lBack = Math.abs(robot.leftBack.getCurrentPosition()) + (int) (inches * countsPerInch);
-            rFront = Math.abs(robot.rightFront.getCurrentPosition()) + (int) (inches * countsPerInch);// goes 1 less for roll over
+
             rBack = Math.abs(robot.rightBack.getCurrentPosition()) + (int) (inches * countsPerInch);
-            runEncoder(lFront, lBack, rFront, rBack, timeoutS, speed);
+            runEncoder(lBack, rBack, timeoutS, speed);
         }
     }
 
-    private void runEncoder(int Lfront, int Lback, int Rfront, int Rback, double timeoutS, //change to calc timeout
+    private void runEncoder(int Lback, int Rback, double timeoutS, //change to calc timeout
                             double speed) {
         if (!opModeIsActive()) {
             stop();
         }
         if (isStopRequested()) {
             robot.leftBack.setPower(0);
-            robot.leftFront.setPower(0);
             robot.rightBack.setPower(0);
-            robot.rightFront.setPower(0);
+
         } else {
             runtime.reset();
-            boolean dir = robot.leftFront.getCurrentPosition() < Lfront;
+            boolean dir = robot.leftBack.getCurrentPosition() < Lback;
             double delta = 10;
             // keep looping while we are still active, and there is time left, and both motors are running.
 
             for(int i = 0; i <= speed * 10; i++){
                 double power = i * .1;
-                if(checkDistance(Lfront, robot.leftFront, dir) && checkDistance(Lback, robot.leftBack, dir) &&
-                        checkDistance(Rfront, robot.rightFront, dir) && checkDistance(Rback, robot.rightBack, dir)) {
-                    robot.rightFront.setPower(power);
+                if(checkDistance(Lback, robot.leftBack, dir) && checkDistance(Rback, robot.rightBack, dir)) {
                     robot.rightBack.setPower(power);
-                    robot.leftFront.setPower(power);
                     robot.leftBack.setPower(power);
                 }
             }
 
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (checkDistance(Lfront, robot.leftFront, dir) && checkDistance(Lback, robot.leftBack, dir) &&
-                    checkDistance(Rfront, robot.rightFront, dir) && checkDistance(Rback, robot.rightBack, dir))) {
-                if(robot.rightFront.getCurrentPosition() > robot.leftFront.getCurrentPosition() + delta){
-                    //slows the right front motor down if it is faster then the left one
-                    robot.rightFront.setPower(Math.abs(speed) - .1);
-                }
-                if(robot.leftFront.getCurrentPosition() > robot.rightFront.getCurrentPosition() + delta){
-                    //slows the left front motor down if it is faster then th right one
-                    robot.leftFront.setPower(Math.abs(speed) - .1);
-                }
+                    (checkDistance(Lback, robot.leftBack, dir) && checkDistance(Rback, robot.rightBack, dir))) {
+
                 if(robot.rightBack.getCurrentPosition() > robot.leftBack.getCurrentPosition() + delta){
                     robot.rightBack.setPower(Math.abs(speed) - .1);
                 }
@@ -252,11 +219,8 @@ public class AutoBase extends LinearOpMode {
                 }
 
                 // Display it for the driver.
-                telemetry.addData("Front", "Running to %7d :%7d", Lfront, Rfront);
                 telemetry.addData("Back", "Running to %7d :%7d", Lback, Rback);
-                telemetry.addData("front 2", "Running at %7d :%7d",
-                        robot.leftFront.getCurrentPosition(),
-                        robot.rightFront.getCurrentPosition());
+
                 telemetry.addData("back 2", "Running at %7d :%7d",
                         robot.leftBack.getCurrentPosition(),
                         robot.rightBack.getCurrentPosition());
@@ -265,9 +229,9 @@ public class AutoBase extends LinearOpMode {
             telemetry.addLine("STOP");
             telemetry.update();
             // Stop all motion;
-            robot.leftFront.setPower(0);
+
             robot.leftBack.setPower(0);
-            robot.rightFront.setPower(0);
+
             robot.rightBack.setPower(0);
         }
     }

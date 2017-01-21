@@ -11,12 +11,6 @@ public class Calibrate extends AutoBase {
     public void runOpMode() {
         initialize(hardwareMap);
         waitForStart();
-        turn(90, 30);
-        boolean light = false;
-        for(int i = 0; i < 10; i ++){
-            light = !light;
-            robot.color.enableLed(light);
-            sleep(500);
-        }
+        turn(100000, 30);
 }
 }
