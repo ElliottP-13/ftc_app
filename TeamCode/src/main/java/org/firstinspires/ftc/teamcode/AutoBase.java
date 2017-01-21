@@ -19,9 +19,10 @@ public class AutoBase extends LinearOpMode {
     static final double countsPerDegree = 3.25;
     static final double voltSlide = 4;
     static final double driveSpeed = 0.3;
-    static final double turnSpeed = 1.0;
+    static final double turnSpeed = .7;
     static final double miliPerInch = 55.8556;
-    static final double miliPerDegree = 8.366;
+    static final double miliPerDegree = 80.366;
+    //goes about 720 + 45 degrees, when told to go 90 degrees
     static final double voltChange = 0.7;
     Robot robot = null;
 
@@ -141,11 +142,13 @@ public class AutoBase extends LinearOpMode {
             lAdjust *= -1;
             ldir = false;
         }
-        for(int i = 0; i <= speed * 10; i++){
-            double power = i * .1;
-            robot.rightBack.setPower(power * rAdjust);
-            robot.leftBack.setPower(power * lAdjust);
-        }
+        robot.rightBack.setPower(speed * rAdjust);
+        robot.leftBack.setPower(speed * lAdjust);
+//        for(int i = 0; i <= speed * 10; i++){
+//            double power = i * .1;
+//            robot.rightBack.setPower(power * rAdjust);
+//            robot.leftBack.setPower(power * lAdjust);
+//        }
         // keep looping while we are still active, and there is time left, and both motors are running.
         while (opModeIsActive() &&
                 (runtime.seconds() < timeoutS) &&
