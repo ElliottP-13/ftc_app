@@ -11,6 +11,6 @@ public class Calibrate extends AutoBase {
     public void runOpMode() {
         initialize(hardwareMap);
         waitForStart();
-        turnTime(90);
+        turn(90, 30);
 }
 }

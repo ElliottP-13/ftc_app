@@ -28,10 +28,14 @@ public class Tele extends LinearOpMode {
 
             //bot.harvester.setPower(.75);
             if (slow) {//runs the drive
+                bot.rightFront.setPower((-gamepad1.right_stick_y) / 3);
                 bot.rightBack.setPower((-gamepad1.right_stick_y) / 3);
+                bot.leftFront.setPower((-gamepad1.left_stick_y) / 3);
                 bot.leftBack.setPower((-gamepad1.left_stick_y) / 3);
             } else {
+                bot.rightFront.setPower(-gamepad1.right_stick_y);
                 bot.rightBack.setPower(-gamepad1.right_stick_y);
+                bot.leftFront.setPower(-gamepad1.left_stick_y);
                 bot.leftBack.setPower(-gamepad1.left_stick_y);
             }
             if (gamepad1.a && !a1Pressed) {//slows it down for bubb

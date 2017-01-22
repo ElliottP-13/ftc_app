@@ -15,7 +15,7 @@ import java.util.Map;
 public class AutoBase extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
 
-    static final double countsPerInch = 37.5;
+    static final double countsPerInch = 39.5;
     static final double countsPerDegree = 3.25;
     static final double voltSlide = 4;
     static final double driveSpeed = 0.3;
@@ -142,7 +142,9 @@ public class AutoBase extends LinearOpMode {
             lAdjust *= -1;
             ldir = false;
         }
+        robot.rightFront.setPower(speed * rAdjust);
         robot.rightBack.setPower(speed * rAdjust);
+        robot.leftFront.setPower(speed * lAdjust);
         robot.leftBack.setPower(speed * lAdjust);
 //        for(int i = 0; i <= speed * 10; i++){
 //            double power = i * .1;
@@ -205,7 +207,9 @@ public class AutoBase extends LinearOpMode {
             for(int i = 0; i <= speed * 10; i++){
                 double power = i * .1;
                 if(checkDistance(Lback, robot.leftBack, dir) && checkDistance(Rback, robot.rightBack, dir)) {
+                    robot.rightFront.setPower(power);
                     robot.rightBack.setPower(power);
+                    robot.leftFront.setPower(power);
                     robot.leftBack.setPower(power);
                 }
             }
