@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -15,7 +16,9 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
  */
 public class Robot{
     HardwareMap map;
+    DcMotor rightFront;
     DcMotor rightBack;
+    DcMotor leftFront;
     DcMotor leftBack;
     DcMotor harvester;
     DcMotor shooter;
@@ -27,7 +30,9 @@ public class Robot{
         // Save reference to Hardware map
         map = HMap;
 
+        rightFront = map.dcMotor.get("Right Front");
         rightBack = map.dcMotor.get("Right Back");
+        leftFront = map.dcMotor.get("Left Front");
         leftBack = map.dcMotor.get("Left Back");
 
         harvester = map.dcMotor.get("Harvester");
@@ -35,6 +40,7 @@ public class Robot{
 
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         controller = map.dcMotorController.get("left");
