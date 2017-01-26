@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import com.qualcomm.ftccommon.FtcEventLoop;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -15,11 +16,11 @@ import java.util.Map;
 public class AutoBase extends LinearOpMode {
     public ElapsedTime runtime = new ElapsedTime();
 
-    static final double countsPerInch = 39.5;
-    static final double countsPerDegree = 2.975;//3.25 = old
+    static final double countsPerInch = 29.5;
+    static final double countsPerDegree = 2.575;//3.25 = old
     static final double voltSlide = 4;
-    static final double driveSpeed = 0.3;
-    static final double turnSpeed = .4;
+    static final double driveSpeed = 0.5;
+    static final double turnSpeed = .35;
     static final double miliPerInch = 30;
     static final double miliPerDegree = 8.017;
     //goes about 720 + 45 degrees, when told to go 90 degrees
@@ -80,10 +81,10 @@ public class AutoBase extends LinearOpMode {
             }
             for(int i = 0; i <= 1 * 10; i++){
                 double power = i * .1;
-                robot.rightFront.setPower(power);
-                robot.rightBack.setPower(power);
-                robot.leftFront.setPower(power);
-                robot.leftBack.setPower(power);
+                robot.rightFront.setPower(power * Rpower);
+                robot.rightBack.setPower(power * Rpower);
+                robot.leftFront.setPower(power * Lpower);
+                robot.leftBack.setPower(power * Lpower);
             }
             while ((runtime.milliseconds() < ((miliPerInch * Math.abs(inches)) + voltAjust * robot.checkVoltage())) && opModeIsActive()) {
                 //do nothing because we are waiting for it to finish
@@ -194,13 +195,14 @@ public class AutoBase extends LinearOpMode {
                     robot.leftBack.getCurrentPosition(),
                     robot.rightBack.getCurrentPosition());
             telemetry.update();
-            //sleep(50);
-            Thread.currentThread().yield();
+            //maybe try doing sleep or Thread.yield
         }
         telemetry.addLine("I am Done");
         telemetry.update();
         // Stop all motion;
         robot.leftBack.setPower(0);
+        robot.leftFront.setPower(0);
+        robot.rightFront.setPower(0);
         robot.rightBack.setPower(0);
 
     }
@@ -234,28 +236,43 @@ public class AutoBase extends LinearOpMode {
         } else {
             runtime.reset();
             boolean dir = robot.leftBack.getCurrentPosition() < Lback;
+            int direction = 1;
+            if(!dir){//go backwards
+                direction = -1;
+            }
             double delta = 10;
             // keep looping while we are still active, and there is time left, and both motors are running.
 
             for(int i = 0; i <= speed * 10; i++){
                 double power = i * .1;
                 if(checkDistance(Lback, robot.leftBack, dir) && checkDistance(Rback, robot.rightBack, dir)) {
-                    robot.rightFront.setPower(power);
-                    robot.rightBack.setPower(power);
-                    robot.leftFront.setPower(power);
-                    robot.leftBack.setPower(power);
+                    robot.rightFront.setPower(power * direction);
+                    robot.rightBack.setPower(power * direction);
+                    robot.leftFront.setPower(power * direction);
+                    robot.leftBack.setPower(power * direction);
                 }
             }
-
+            int left = 0;
+            int right = 0;
             while (opModeIsActive() &&
                     (runtime.seconds() < timeoutS) &&
-                    (checkDistance(Lback, robot.leftBack, dir) || checkDistance(Rback, robot.rightBack, dir))) {
+                    (checkDistance(Lback, robot.leftBack, dir) && checkDistance(Rback, robot.rightBack, dir))) {
 
                 if(robot.rightBack.getCurrentPosition() > robot.leftBack.getCurrentPosition() + delta){
-                    robot.rightBack.setPower(Math.abs(speed) - .1);
+                    telemetry.addLine("Slow Right");
+                    right ++;
+                    robot.rightFront.setPower(Math.abs(speed) - .2);
+                    robot.rightBack.setPower(Math.abs(speed) - .2);
+                    robot.leftFront.setPower(Math.abs(speed));
+                    robot.leftBack.setPower(Math.abs(speed));
                 }
                 if(robot.leftBack.getCurrentPosition() > robot.rightBack.getCurrentPosition() + delta){
-                    robot.leftBack.setPower(Math.abs(speed) - .1);
+                    telemetry.addLine("Slow Left");
+                    left ++;
+                    robot.leftFront.setPower(Math.abs(speed) - .2);
+                    robot.leftBack.setPower(Math.abs(speed) - .2);
+                    robot.rightFront.setPower(Math.abs(speed));
+                    robot.rightBack.setPower(Math.abs(speed));
                 }
 
                 // Display it for the driver.
@@ -267,23 +284,36 @@ public class AutoBase extends LinearOpMode {
                 telemetry.update();
             }
             telemetry.addLine("STOP");
+            telemetry.addData("Slowed", "Right %7d Left %7d", right, left);
             telemetry.update();
             // Stop all motion;
-
+            robot.leftFront.setPower(0);
             robot.leftBack.setPower(0);
-
+            robot.rightFront.setPower(0);
             robot.rightBack.setPower(0);
         }
     }
     private boolean checkDistance(int tickTarget, DcMotor motor, boolean forwards){
         telemetry.addLine("" + (Math.abs(tickTarget) < Math.abs(motor.getCurrentPosition())));
-        if(robot.checkVoltage() > 12.3){//calculate slide
-            tickTarget -= (4 * (robot.checkVoltage() - 12.3));
-        }
         if(forwards)
             return Math.abs(tickTarget) > Math.abs(motor.getCurrentPosition());
         else
             return tickTarget < motor.getCurrentPosition();
+    }
+    public boolean checkColor(){
+        boolean red = robot.color.red() > robot.color.blue();//return true if it is red, false if it is blue
+        if(red && allianceColor.equals("Red")){//it is red and we are red
+            return true;
+        }
+        else if(red && allianceColor.equals("Blue")){//it is red and we are blue
+            return false;
+        }
+        else if(!red && allianceColor.equals("Blue")){//it is blue, and we are blue
+            return true;
+        }
+        else {//it is blue and we are red
+            return false;
+        }
     }
     public void selectOptions() {
         boolean aPressed = false;

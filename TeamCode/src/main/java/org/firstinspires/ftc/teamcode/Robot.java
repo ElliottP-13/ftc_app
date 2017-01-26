@@ -39,8 +39,6 @@ public class Robot {
         harvester = map.dcMotor.get("Harvester");
         shooter = map.dcMotor.get("Shooter");
 
-        shooter.setDirection(DcMotorSimple.Direction.REVERSE);
-
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
 

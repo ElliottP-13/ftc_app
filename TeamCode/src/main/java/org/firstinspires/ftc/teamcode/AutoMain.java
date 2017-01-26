@@ -17,47 +17,47 @@ public class AutoMain extends AutoBase {
         }*/
         //nap(waitStart.getValue() * 1000);
         //startFork();
-        driveStraight(6, 10);
-        turn(20, 10);
-        //shoot
-        robot.shooter.setPower(.3);
-        nap(5000);
-        robot.shooter.setPower(0);
-        driveStraight(34, 10);
-        turn(60, 10);
-        driveStraight(.7,  50, 10);
-        turn(-90, 10);
-        driveStraight(20, 10);
-        turn(90, 10);
+        robot.color.enableLed(false);
+        driveStraight(.8, 70, 10);//big first movement that gets us in front of the beacon
+        nap(100);//so we don't slide and mess up the turn
+        print("Done Waiting");
+        turn(127, 10);//turns too much so that it accounts for the curve in the slow drive straight
+        driveStraight(.3, 51, 4);//hits button, time so we don't constantly churn against the wall, and goes slow so don't damage field
+
+        if(!checkColor()){//need to hit it again
+            driveStraight(-6, 10);
+            nap(4300);//waits long enough to hit it again
+            driveStraight(.3, 8, 10);
+        }
+        driveStraight(-10, 10);
+        turn(-97, 10);
+        driveStraight(1, 53, 10);//gets in front of second beacon
+        turn(113, 10);
+        driveStraight(.3, 15, 4);
+        if(!checkColor()){//need to hit it again
+            driveStraight(-6, 10);
+            nap(4300);//waits long enough to hit it again
+            driveStraight(.3, 8, 10);
+        }
     }
 
     private void startFork() {
         //start position two
         if (opModeIsActive()) {
             if (startPosition.getValue().equals("Two")) {
-                if (start.getValue().equals("Hit Cap")) {
-                    driveStraight(60, 10);//DeCapps
-                    capFork();
-                } else if (start.getValue().equals("Go Corner")) {
-                    print("going corner");
-                    driveStraight(24, 10);
-                    turn(100, 10);
-                    driveStraight(25, 10);//goes to corner ****Needs Adjustments so Straight On***
-                    turn(90, 10);
-                    driveStraight(24, 10);
-                    //robot.harvester.setPower(-.8);
-                    nap(2000);//waits for us to score in corner goal
-                    cornerFork();
-                } else {
-                    driveStraight(30, 10);
-                    turn(90, 10);
-                    driveStraight(30, 10);
-                    turn(-45, 10);
-                    driveStraight(18, 10);
-                    turn(-70, 10);//should be 45 but something is weird other turns are fine, this one too short
-                    neitherFork();
-                }
-
+                driveStraight(6, 10);
+                turn(20, 10);
+                //shoot
+                robot.shooter.setPower(.3);
+                nap(5000);
+                robot.shooter.setPower(0);
+                driveStraight(34, 10);
+                turn(60, 10);
+                driveStraight(.8,  70, 10);
+                turn(-90, 10);
+                driveStraight(20, 10);
+                turn(90, 10);
+                driveStraight(.3, 50, 10);//hits first button
             }
             /**************************start position one *************************************/
             else {

@@ -13,6 +13,8 @@ public class Calibrate extends AutoBase {
         waitForStart();
         //turnTime(90);
         //driveTime(24);
-        turn(90, 30);
+        //turn(90, 30);
+        driveStraight(24, 30);
+        nap(5 * 1000);
 }
 }
