@@ -20,14 +20,19 @@ public class AutoRead extends LinearOpMode {
     @Override
     public void runOpMode() {
         ReadWrite r = new ReadWrite();
-        ArrayList<Double> rightPower = parsePower(r.readNstoreArrayList("RightSide.txt", " , "));
-        ArrayList<Double> leftPower = parsePower(r.readNstoreArrayList("LeftSide.txt", " , "));
+        ArrayList<Double> rightPower = parsePower(r.readNstoreArrayList("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\RightSide.txt", " , "));
+        ArrayList<Double> leftPower = parsePower(r.readNstoreArrayList("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\LeftSide.txt", " , "));
         initalize();
         waitForStart();
         boolean run = true;
         int i = 0;
         double setRightPower = 0;
         double setLeftPower = 0;
+
+        telemetry.addLine("Lenght " + rightPower.size());
+        telemetry.update();
+        sleep(2000);
+
         while (opModeIsActive() && run){
 
             if(i < rightPower.size() && i < leftPower.size()) {
@@ -43,17 +48,26 @@ public class AutoRead extends LinearOpMode {
             rightBack.setPower(setRightPower);
             leftFront.setPower(setLeftPower);
             leftBack.setPower(setLeftPower);
+
+            i++;
+            sleep(10);//sleep so it is the same timing as the writer
         }
+        telemetry.addLine("ALL DONE");
+        telemetry.update();
         rightFront.setPower(0);
         rightBack.setPower(0);
         leftFront.setPower(0);
         leftBack.setPower(0);
+
     }
     private ArrayList<Double> parsePower(ArrayList<String> list){
         ArrayList<Double> ret = new ArrayList<Double>();
-        for (int i = 0; i < list.size(); i++){
-            double d = Double.parseDouble(list.get(i));
-            ret.add(d);
+        if(list.get(0) != null) {
+            for (int i = 0; i < list.size(); i++) {
+                double d = Double.parseDouble(list.get(i));
+                ret.add(d);
+            }
+            return ret;
         }
         return ret;
     }

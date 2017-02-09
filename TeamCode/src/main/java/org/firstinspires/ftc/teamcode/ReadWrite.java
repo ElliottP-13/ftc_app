@@ -34,8 +34,7 @@ public class ReadWrite {
         // file and stores it in a ArrayList
         File file = new File(filePath);
         String retString = "";
-        ArrayList<String> words = new ArrayList<String>();
-        words = new ArrayList<String>(50);
+        ArrayList<String> words = new ArrayList<String>(3000);
 
         if (file.exists()) {
             try {

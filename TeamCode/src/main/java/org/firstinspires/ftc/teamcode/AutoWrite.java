@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.File;
@@ -39,17 +40,33 @@ public class AutoWrite extends LinearOpMode {
 
             leftPower.add(leftJoyPower);
             rightPower.add(rightJoyPower);
-        }
 
-        File rightSide = r.createFileIfNotExists("RightSide.txt");
+            telemetry.addLine("Time Left " + (30 - runtime.seconds()));
+            telemetry.update();
+            sleep(10);//sleep for a bit so we dont end up with a billion things in the array
+        }
+        telemetry.addLine("Done Creating Autonomous");
+        telemetry.update();
+        File rightSide = r.createFileIfNotExists("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\RightSide.txt");
         r.overwriteFileWithString(createString(rightPower), rightSide);
-        File leftSide = r.createFileIfNotExists("LeftSide.txt");
+
+        telemetry.addLine("DONE WITH RIGHT SIDE");
+        telemetry.update();
+        sleep(1000);
+
+        File leftSide = r.createFileIfNotExists("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\LeftSide.txt");
         r.overwriteFileWithString(createString(leftPower), leftSide);
+        telemetry.addLine("Done Writing");
+        telemetry.update();
+        sleep(1000);
+        stop();
     }
     private String createString(ArrayList<Double> list){
         String str = "";
         for(int i = 0; i < list.size(); i++){
             str = str + list.get(i) + " , ";
+            telemetry.addLine("I is " + i);
+            telemetry.update();
         }
         return str;
     }
@@ -58,5 +75,9 @@ public class AutoWrite extends LinearOpMode {
         rightBack = hardwareMap.dcMotor.get("right back");
         leftFront = hardwareMap.dcMotor.get("left front");
         leftBack = hardwareMap.dcMotor.get("left back");
+
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+
     }
 }
