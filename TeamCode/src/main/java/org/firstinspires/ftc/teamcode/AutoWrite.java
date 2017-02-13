@@ -47,14 +47,14 @@ public class AutoWrite extends LinearOpMode {
         }
         telemetry.addLine("Done Creating Autonomous");
         telemetry.update();
-        File rightSide = r.createFileIfNotExists("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\RightSide.txt");
+        File rightSide = r.createFileIfNotExists("RightSide.txt");
         r.overwriteFileWithString(createString(rightPower), rightSide);
 
         telemetry.addLine("DONE WITH RIGHT SIDE");
         telemetry.update();
         sleep(1000);
 
-        File leftSide = r.createFileIfNotExists("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\LeftSide.txt");
+        File leftSide = r.createFileIfNotExists("LeftSide.txt");
         r.overwriteFileWithString(createString(leftPower), leftSide);
         telemetry.addLine("Done Writing");
         telemetry.update();

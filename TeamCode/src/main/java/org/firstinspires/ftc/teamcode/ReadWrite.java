@@ -30,6 +30,9 @@ public class ReadWrite {
 
         return retString;
     }
+
+
+
     public ArrayList readNstoreArrayList(String filePath, String delimiter) { // Reads the
         // file and stores it in a ArrayList
         File file = new File(filePath);

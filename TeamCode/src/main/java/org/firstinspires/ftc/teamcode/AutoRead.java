@@ -20,8 +20,8 @@ public class AutoRead extends LinearOpMode {
     @Override
     public void runOpMode() {
         ReadWrite r = new ReadWrite();
-        ArrayList<Double> rightPower = parsePower(r.readNstoreArrayList("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\RightSide.txt", " , "));
-        ArrayList<Double> leftPower = parsePower(r.readNstoreArrayList("ftc_app\\TeamCode\\src\\main\\java\\org\\firstinspires\\ftc\\teamcode\\LeftSide.txt", " , "));
+        ArrayList<Double> rightPower = parsePower(r.readNstoreArrayList("RightSide.txt", " , "));
+        ArrayList<Double> leftPower = parsePower(r.readNstoreArrayList("LeftSide.txt", " , "));
         initalize();
         waitForStart();
         boolean run = true;
