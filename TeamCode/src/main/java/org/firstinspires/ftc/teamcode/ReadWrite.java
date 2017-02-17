@@ -3,10 +3,15 @@ package org.firstinspires.ftc.teamcode;
 /**
  * Created by epryor on 1/30/2017.
  */
+import android.content.Context;
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Random;
@@ -106,5 +111,17 @@ public class ReadWrite {
             writer.close();
         } catch (IOException ignored) {
         }
+    }
+    public File createInternalFile(Context context, String filename){
+        File file = new File(context.getFilesDir(), filename);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException ignored) {
+                int x = 0/0;//so I can see if it failed
+                ignored.printStackTrace();
+            }
+        }
+        return file;
     }
 }
