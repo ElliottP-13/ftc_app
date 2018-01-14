@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -18,6 +19,7 @@ import java.util.Locale;
  */
 
 @Autonomous(name = "Sensor Test", group = "Test")
+@Disabled
 public class SensorTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

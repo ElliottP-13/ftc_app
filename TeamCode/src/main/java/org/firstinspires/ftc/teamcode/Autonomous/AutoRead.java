@@ -11,7 +11,7 @@ import java.util.ArrayList;
 /**
  * Created by epryor on 1/30/2017.
  */
-@Autonomous(name = "Auto Read", group = "Linear Opmode")
+@Autonomous(name = "Auto Read", group = "Instant")
 public class AutoRead extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();

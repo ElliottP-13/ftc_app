@@ -26,7 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 /**
  * Created by pryor on 1/11/2018.
  */
-@Autonomous(name = "Blue Autonomous")
+@Autonomous(name = "Blue Autonomous", group = "Autonomous")
 public class AutoBlue extends LinearOpMode {
 
     VuforiaLocalizer vuforia;

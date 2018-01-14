@@ -14,7 +14,6 @@ import java.util.ArrayList;
  */
 
 @TeleOp(name = "Tele Write", group = "Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
 public class AutoWrite extends LinearOpMode {
     DcMotor rightFront;
     DcMotor rightBack;
