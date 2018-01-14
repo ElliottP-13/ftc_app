@@ -1,11 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -44,9 +41,9 @@ public class AutoWrite extends LinearOpMode {
         initalize();
         waitForStart();
         runtime.reset();
-        while (runtime.seconds() <= 30){
-            double rightJoyPower = -gamepad1.right_stick_y;
-            double leftJoyPower = -gamepad1.left_stick_y;
+        while ((runtime.seconds() <= 30) && !gamepad1.a){
+            double rightJoyPower = gamepad1.right_stick_y;
+            double leftJoyPower = gamepad1.left_stick_y;
 
 
             rightFront.setPower(rightJoyPower);
@@ -124,8 +121,8 @@ public class AutoWrite extends LinearOpMode {
         leftServo = hardwareMap.get(Servo.class, "left hook");
         rightServo = hardwareMap.get(Servo.class, "right hook");
 
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
+        leftServo.setPosition(1);
+        rightServo.setPosition(-1);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery

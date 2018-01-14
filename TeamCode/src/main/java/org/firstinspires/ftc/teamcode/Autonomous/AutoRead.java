@@ -1,13 +1,11 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Autonomous;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -97,8 +95,6 @@ public class AutoRead extends LinearOpMode {
         leftBack.setPower(0);
         arm1.setPower(0);
 
-        stop();
-
     }
     private ArrayList<Double> parsePower(ArrayList<String> list){
         telemetry.addLine("Original length " + list.size());
@@ -125,8 +121,8 @@ public class AutoRead extends LinearOpMode {
         rightServo = hardwareMap.get(Servo.class, "right hook");
 
 
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
+        leftServo.setPosition(1);
+        rightServo.setPosition(-1);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery

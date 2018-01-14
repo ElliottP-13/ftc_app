@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -52,7 +52,6 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Tank", group="Linear Opmode")
-
 public class LinearTele extends LinearOpMode {
 
     // Declare OpMode members.

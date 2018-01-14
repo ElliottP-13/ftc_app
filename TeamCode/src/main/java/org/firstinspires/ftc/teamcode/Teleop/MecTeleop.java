@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -114,8 +114,8 @@ public class MecTeleop extends LinearOpMode {
 
         dropper.setPosition(0);
 
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
+        leftServo.setPosition(1);
+        rightServo.setPosition(-1);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
