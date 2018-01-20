@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -57,7 +58,10 @@ public class gyroTele extends LinearOpMode {
             double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
             double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
+            robotAngle -= Math.toRadians(getRelativeHeading());
+
             double rightX = -gamepad1.right_stick_x;
+
             final double lf = r * Math.cos(robotAngle) + rightX;
             final double rf = r * Math.sin(robotAngle) - rightX;
             final double lb = r * Math.sin(robotAngle) + rightX;
@@ -69,6 +73,10 @@ public class gyroTele extends LinearOpMode {
                 div = 2;
             } else {
                 div = 1;
+            }
+
+            if(gamepad1.a){
+                resetHeading();
             }
 
             leftFront.setPower(lf/div);
@@ -95,7 +103,6 @@ public class gyroTele extends LinearOpMode {
                 leftServo.setPosition(.52);
                 rightServo.setPosition(.59);
             }
-
 
             if(gamepad2.a){
                spindle.setPower(1);
@@ -168,7 +175,7 @@ public class gyroTele extends LinearOpMode {
 
 
 
-
+        rightGrab.setDirection(DcMotor.Direction.REVERSE);
 
         dropper.setPosition(0);
 
