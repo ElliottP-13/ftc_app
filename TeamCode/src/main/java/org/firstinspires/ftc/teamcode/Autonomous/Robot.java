@@ -119,6 +119,9 @@ public abstract class Robot extends LinearOpMode {
         boolean finished = false;
         double x = 0;
 
+        double dir = (in > 0) ? 1 : -1;
+        double power = 0.7 * dir;
+
         double tX;
 
         VuforiaTrackables relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
@@ -132,15 +135,17 @@ public abstract class Robot extends LinearOpMode {
 //            //do nothing!
 //        }
 
-        //x = pose.getTranslation().get(0);
+        //x = pose.getTranslation().get(0)/25.4;
         tX = x + in;
 
-        rightFront.setPower(.7);
-        rightBack.setPower(.7);
-        leftFront.setPower(.7);
-        leftBack.setPower(.7);
+        rightFront.setPower(power);
+        rightBack.setPower(power);
+        leftFront.setPower(power);
+        leftBack.setPower(power);
 
         runtime.reset();
+
+        double initialHeading = getRelativeHeading();
 
         double lastTime = runtime.milliseconds();
         double time;
@@ -154,12 +159,13 @@ public abstract class Robot extends LinearOpMode {
 
                 if (pose != null) {
                     // Extract the X component of the offset of the target relative to the robot
-                    x = pose.getTranslation().get(0);
+                    x = pose.getTranslation().get(0)/25.4;
                 }
             } else {
                 time = runtime.milliseconds() - lastTime;
                 x += (0.0461 * time); //projects the change in distance if the target isn't visible.
 
+                telemetry.addData("X", "%s visible", x);
             }
 
             if (x >= tX - 1.53){
@@ -168,6 +174,23 @@ public abstract class Robot extends LinearOpMode {
 
             lastTime = runtime.milliseconds();
 
+            telemetry.update();
+
+            if(getRelativeHeading() - initialHeading > 0){
+                rightFront.setPower(rightFront.getPower() - (.05 * dir));
+                rightBack.setPower(rightBack.getPower() - (.05 * dir));
+                leftFront.setPower(power);
+                leftBack.setPower(power);
+            } else if (getRelativeHeading() - initialHeading < 0){
+                rightFront.setPower(power);
+                rightBack.setPower(power);
+                leftFront.setPower(leftFront.getPower() - (.05 * dir));
+                leftBack.setPower(leftBack.getPower() - (.05 * dir));
+            }
+
+
+
+            nap(50);
         }
 
         rightFront.setPower(0);
@@ -179,7 +202,8 @@ public abstract class Robot extends LinearOpMode {
 
     public void driveStraight(double in) {
 
-        double power = (in > 0) ? 0.7 : -0.7;
+        double dir = (in > 0) ? 1 : -1;
+        double power = 0.7 * dir;
         double timeToRun = (in - 1.5293) / 0.0461;
 
         rightFront.setPower(power);
@@ -189,9 +213,25 @@ public abstract class Robot extends LinearOpMode {
 
         runtime.reset();
 
+        double initialHeading = getRelativeHeading();
+
         while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
-            //DO NOTHING!
             updateTelemetry();
+
+            if(getRelativeHeading() - initialHeading > 0){
+                rightFront.setPower(rightFront.getPower() - (.05 * dir));
+                rightBack.setPower(rightBack.getPower() - (.05 * dir));
+                leftFront.setPower(power);
+                leftBack.setPower(power);
+            } else if (getRelativeHeading() - initialHeading < 0){
+                rightFront.setPower(power);
+                rightBack.setPower(power);
+                leftFront.setPower(leftFront.getPower() - (.05 * dir));
+                leftBack.setPower(leftBack.getPower() - (.05 * dir));
+            }
+
+
+
         }
 
         rightFront.setPower(0);
@@ -308,9 +348,9 @@ public abstract class Robot extends LinearOpMode {
         return AngleUnit.DEGREES.normalize(getAbsoluteHeading() - heading);
     }
 
-    public void nap(int time) {
-        runtime.reset();
-        while (opModeIsActive() && runtime.milliseconds() < time) {
+    public void nap(double time) {
+        double startime = runtime.milliseconds();
+        while (opModeIsActive() && (runtime.milliseconds() - startime) < time) {
             updateTelemetry();
         }
     }
@@ -320,7 +360,7 @@ public abstract class Robot extends LinearOpMode {
     }
 
     private void updateTelemetry() {
-        telemetry.addData("Heading", "Angle = %.2f", getRelativeHeading());
-        telemetry.update();
+        //telemetry.addData("Heading", "Angle = %.2f", getRelativeHeading());
+        //telemetry.update();
     }
 }

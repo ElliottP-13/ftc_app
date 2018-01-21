@@ -27,7 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * Created by pryor on 1/11/2018.
  */
 @Autonomous(name = "Blue Autonomous", group = "Autonomous")
-public class AutoBlue extends LinearOpMode {
+public class AutoBlue extends Robot {
 
     VuforiaLocalizer vuforia;
 
@@ -126,11 +126,24 @@ public class AutoBlue extends LinearOpMode {
 
             if(vuMark == RelicRecoveryVuMark.CENTER){
                 //RUN CENTER CODE
+                vuforiaDrive(44.5);
+                nap(250);
+                turnToDegree(90);
+                driveStraight(29);
+
             } else if(vuMark == RelicRecoveryVuMark.LEFT) {
                 //RUN LEFT CODE
+                vuforiaDrive(29.5);
+                nap(250);
+                turnToDegree(90);
+                driveStraight(29);
             }
             else if(vuMark == RelicRecoveryVuMark.RIGHT){
                 //RUN RIGHT CODE
+                vuforiaDrive(55.5);
+                nap(250);
+                turnToDegree(90);
+                driveStraight(29);
 
             }
 
@@ -140,122 +153,11 @@ public class AutoBlue extends LinearOpMode {
                  * on which VuMark was visible. */
             telemetry.addData("VuMark", "%s visible", vuMark);
 
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
-
-            //telemetry.addData("Pose", format(pose));
-
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-            if (pose != null) {
-                VectorF trans = pose.getTranslation();
-                Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-
-                // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                double tX = trans.get(0);
-                double tY = trans.get(1);
-                double tZ = trans.get(2);
-
-                // Extract the rotational components of the target relative to the robot
-                double rX = rot.firstAngle;
-                double rY = rot.secondAngle;
-                double rZ = rot.thirdAngle;
-
-                telemetry.addLine("X: " + tX + " Y: " + tY + " Z: " + tZ);
-                telemetry.addLine("rX: " + rX + " rY: " + rY + " rZ: " + rZ);
-            }
-
         } else {
             telemetry.addData("VuMark", "not visible");
         }
 
         telemetry.update();
-
-    }
-
-    private void driveStraight(double cm) {
-
-        double power = (cm > 0) ? 1 : -1;
-        double timeToRun = cm * msPerCm;
-
-        rightFront.setPower(power);
-        rightBack.setPower(power);
-        leftFront.setPower(power);
-        leftBack.setPower(power);
-
-        runtime.reset();
-
-        while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
-            //DO NOTHING!
-        }
-
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-
-
-    }
-
-    private void turn(double degree) {
-
-        double power = (degree > 0) ? .7 : -.7;
-        double timeToRun = degree * msPerDeg;
-
-        rightFront.setPower(power);
-        rightBack.setPower(power);
-        leftFront.setPower(-power);
-        leftBack.setPower(-power);
-
-        runtime.reset();
-
-        while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
-            //DO NOTHING!
-        }
-
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-
-
-    }
-
-    private void initialize() {
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-
-        leftFront = hardwareMap.get(DcMotor.class, "left front");
-        leftBack = hardwareMap.get(DcMotor.class, "left back");
-        rightFront = hardwareMap.get(DcMotor.class, "right front");
-        rightBack = hardwareMap.get(DcMotor.class, "right back");
-
-        arm1 = hardwareMap.get(DcMotor.class, "arm");
-        arm2 = hardwareMap.get(DcMotor.class, "arm 2");
-        //dropper = hardwareMap.get(Servo.class, "dropper");
-        leftServo = hardwareMap.get(Servo.class, "left hook");
-        rightServo = hardwareMap.get(Servo.class, "right hook");
-
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
-
-        //dropper.setPosition(0);
-
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
-
-        arm2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
 
     }
 
