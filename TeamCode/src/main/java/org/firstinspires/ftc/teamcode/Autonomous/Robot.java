@@ -48,6 +48,7 @@ public abstract class Robot extends LinearOpMode {
 
     private Servo leftServo = null;
     private Servo rightServo = null;
+    private Servo phone = null;
 
     private ColorSensor colorSensor = null;
     private DistanceSensor distanceSensor = null;
@@ -76,6 +77,7 @@ public abstract class Robot extends LinearOpMode {
         //dropper = hardwareMap.get(Servo.class, "dropper");
         leftServo = map.get(Servo.class, "left hook");
         rightServo = map.get(Servo.class, "right hook");
+        phone = map.get(Servo.class, "phone servo");
 
         colorSensor = map.get(ColorSensor.class, "sensor");
         distanceSensor = map.get(DistanceSensor.class, "sensor");
@@ -112,6 +114,107 @@ public abstract class Robot extends LinearOpMode {
         vuforiaParams.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(vuforiaParams);
 
+
+    }
+
+
+    public void vuforiaTrack(double tX, double tZ, double rot) {
+        boolean finished = false;
+        double x = 0;
+        double z = 0;
+
+        double r = Math.hypot(tX - x, tZ - z);
+        double robotAngle = Math.atan2(tX - x, tZ - z) - Math.PI / 4;
+
+        double turn = getRelativeHeading(rot) / 180;//binds it between -1 and 1
+
+        double lf = r * Math.cos(robotAngle) + turn;
+        double rf = r * Math.sin(robotAngle) - turn;
+        double lb = r * Math.sin(robotAngle) + turn;
+        double rb = r * Math.cos(robotAngle) - turn;
+
+        VuforiaTrackables relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
+        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+
+        relicTrackables.activate();
+
+        while (pose == null) {
+            //do nothing!
+        }
+
+        x = pose.getTranslation().get(0) / 25.4;
+        z = pose.getTranslation().get(2) / 25.4;
+
+//        rightFront.setPower(rf);
+//        rightBack.setPower(rb);
+//        leftFront.setPower(lf);
+//        leftBack.setPower(lb);
+
+        runtime.reset();
+
+        double lastTime = runtime.milliseconds();
+        double time;
+
+        while (!finished) {
+
+            r = Math.hypot(tX - x, tZ - z);
+            robotAngle = Math.atan2(tX - x, tZ - z) - Math.PI / 4;
+
+            turn = getRelativeHeading(rot) / 180;//binds it between -1 and 1
+
+            lf = r * Math.cos(robotAngle) + turn;
+            rf = r * Math.sin(robotAngle) - turn;
+            lb = r * Math.sin(robotAngle) + turn;
+            rb = r * Math.cos(robotAngle) - turn;
+
+            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                telemetry.addData("VuMark", "%s visible", vuMark);
+                pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+
+                telemetry.addData("Pose", format(pose));
+
+                if (pose != null) {
+                    // Extract the X component of the offset of the target relative to the robot
+                    x = pose.getTranslation().get(0) / 25.4;
+                    z = pose.getTranslation().get(2) / 25.4;
+                }
+            } else { //switch to trig
+                time = runtime.milliseconds() - lastTime;
+                x += (0.0461 * time) * Math.sin(robotAngle); //projects the change in distance if the target isn't visible.
+                z += (0.0461 * time) * Math.cos(robotAngle);
+
+                telemetry.addData("X", "%s visible", x);
+            }
+
+            //set servo position
+
+            phone.setPosition(Math.atan(x / z) / (Math.PI) + 0.5);//should return between 0 and 1
+
+
+            if (x >= tX - 1.53) {
+                finished = true;
+            }
+
+            lastTime = runtime.milliseconds();
+
+            telemetry.update();
+
+//            rightFront.setPower(rf);
+//            rightBack.setPower(rb);
+//            leftFront.setPower(lf);
+//            leftBack.setPower(lb);
+
+            nap(50);
+        }
+
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftFront.setPower(0);
+        leftBack.setPower(0);
 
     }
 
@@ -159,7 +262,7 @@ public abstract class Robot extends LinearOpMode {
 
                 if (pose != null) {
                     // Extract the X component of the offset of the target relative to the robot
-                    x = pose.getTranslation().get(0)/25.4;
+                    x = pose.getTranslation().get(0) / 25.4;
                 }
             } else {
                 time = runtime.milliseconds() - lastTime;
@@ -168,7 +271,7 @@ public abstract class Robot extends LinearOpMode {
                 telemetry.addData("X", "%s visible", x);
             }
 
-            if (x >= tX - 1.53){
+            if (x >= tX - 1.53) {
                 finished = true;
             }
 
@@ -176,18 +279,17 @@ public abstract class Robot extends LinearOpMode {
 
             telemetry.update();
 
-            if(getRelativeHeading() - initialHeading > 0){
+            if (getRelativeHeading() - initialHeading > 0) {
                 rightFront.setPower(rightFront.getPower() - (.05 * dir));
                 rightBack.setPower(rightBack.getPower() - (.05 * dir));
                 leftFront.setPower(power);
                 leftBack.setPower(power);
-            } else if (getRelativeHeading() - initialHeading < 0){
+            } else if (getRelativeHeading() - initialHeading < 0) {
                 rightFront.setPower(power);
                 rightBack.setPower(power);
                 leftFront.setPower(leftFront.getPower() - (.05 * dir));
                 leftBack.setPower(leftBack.getPower() - (.05 * dir));
             }
-
 
 
             nap(50);
@@ -218,18 +320,17 @@ public abstract class Robot extends LinearOpMode {
         while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
             updateTelemetry();
 
-            if(getRelativeHeading() - initialHeading > 0){
+            if (getRelativeHeading() - initialHeading > 0) {
                 rightFront.setPower(rightFront.getPower() - (.05 * dir));
                 rightBack.setPower(rightBack.getPower() - (.05 * dir));
                 leftFront.setPower(power);
                 leftBack.setPower(power);
-            } else if (getRelativeHeading() - initialHeading < 0){
+            } else if (getRelativeHeading() - initialHeading < 0) {
                 rightFront.setPower(power);
                 rightBack.setPower(power);
                 leftFront.setPower(leftFront.getPower() - (.05 * dir));
                 leftBack.setPower(leftBack.getPower() - (.05 * dir));
             }
-
 
 
         }
