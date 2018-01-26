@@ -18,12 +18,12 @@ public class Calibration extends Robot {
 
         waitForStart();
 
-//        vuforiaDrive(55.5);
+        //vuforiaDrive(55.5);
 //        nap(250);
 //        turnToDegree(90);
 //        driveStraight(29);
 
-        vuforiaTrack(0,0,0);
+        vuforiaTrack(-10,10,0);
 
         nap(10000);
 

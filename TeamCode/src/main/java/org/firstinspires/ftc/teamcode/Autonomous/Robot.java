@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -48,7 +49,7 @@ public abstract class Robot extends LinearOpMode {
 
     private Servo leftServo = null;
     private Servo rightServo = null;
-    private Servo phone = null;
+    public Servo phone = null;
 
     private ColorSensor colorSensor = null;
     private DistanceSensor distanceSensor = null;
@@ -96,6 +97,7 @@ public abstract class Robot extends LinearOpMode {
 
         leftServo.setPosition(0.52);
         rightServo.setPosition(0.59);
+        phone.setPosition(0.5);
 
         rightGrab.setDirection(DcMotor.Direction.REVERSE);
 
@@ -124,7 +126,9 @@ public abstract class Robot extends LinearOpMode {
         double z = 0;
 
         double r = Math.hypot(tX - x, tZ - z);
-        double robotAngle = Math.atan2(tX - x, tZ - z) - Math.PI / 4;
+        double robotAngle = Math.atan2(tZ - z, tX - x) - Math.PI / 4;
+
+        double phonePos = phone.getPosition();
 
         double turn = getRelativeHeading(rot) / 180;//binds it between -1 and 1
 
@@ -137,17 +141,24 @@ public abstract class Robot extends LinearOpMode {
         VuforiaTrackable relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
         OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
 
         relicTrackables.activate();
 
-        while (pose == null) {
+        while (pose == null && opModeIsActive()) {
             //do nothing!
+            pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+
+//            if(runtime.milliseconds() % 500 <= 3) {
+//                phonePos -= 0.01;
+//                phone.setPosition(phonePos);
+//            }
         }
 
         x = pose.getTranslation().get(0) / 25.4;
         z = pose.getTranslation().get(2) / 25.4;
+
+        Orientation rotation = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
 
 //        rightFront.setPower(rf);
 //        rightBack.setPower(rb);
@@ -159,7 +170,8 @@ public abstract class Robot extends LinearOpMode {
         double lastTime = runtime.milliseconds();
         double time;
 
-        while (!finished) {
+        while (!finished && opModeIsActive()) {
+            pose = ((VuforiaTrackableDefaultListener)relicTemplate.getListener()).getPose();
 
             r = Math.hypot(tX - x, tZ - z);
             robotAngle = Math.atan2(tX - x, tZ - z) - Math.PI / 4;
@@ -171,34 +183,43 @@ public abstract class Robot extends LinearOpMode {
             lb = r * Math.sin(robotAngle) + turn;
             rb = r * Math.cos(robotAngle) - turn;
 
-            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-                telemetry.addData("VuMark", "%s visible", vuMark);
-                pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
 
-                telemetry.addData("Pose", format(pose));
+            if (pose != null) {
 
-                if (pose != null) {
-                    // Extract the X component of the offset of the target relative to the robot
-                    x = pose.getTranslation().get(0) / 25.4;
-                    z = pose.getTranslation().get(2) / 25.4;
-                }
-            } else { //switch to trig
-                time = runtime.milliseconds() - lastTime;
-                x += (0.0461 * time) * Math.sin(robotAngle); //projects the change in distance if the target isn't visible.
-                z += (0.0461 * time) * Math.cos(robotAngle);
+                rotation = Orientation.getOrientation(pose, AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
 
-                telemetry.addData("X", "%s visible", x);
+                // Extract the X component of the offset of the target relative to the robot
+                x = pose.getTranslation().get(0) / 25.4;
+                z = pose.getTranslation().get(2) / 25.4;
+
+                x+= .1;
+
+                telemetry.addData("X: ", "%s", x);
+            } else { //switch to trigk
+//                x += (0.0461 * time) * Math.sin(robotAngle); //projects the change in distance if the target isn't visible.
+//                z += (0.0461 * time) * Math.cos(robotAngle);
+//
+//                telemetry.addData("X", "%s visible", x);
+
+                phonePos -= .00001;
             }
 
             //set servo position
 
-            phone.setPosition(Math.atan(x / z) / (Math.PI) + 0.5);//should return between 0 and 1
+            double servoPos = Math.atan(((Math.abs(x) - 0.5))/ (Math.abs(z) + 2.5)) / (3.14) + 0.5; //should return between 0 and 1
+            servoPos -= rotation.secondAngle / Math.PI;
+            //should divide by pi but not sensitive enough (doesn't move enough)
+            int dir = (servoPos - phonePos) < 0 ? -1 : 1;
+            //phonePos += .2;
 
+            phone.setPosition(1 - servoPos);
+            telemetry.addData("Servo Position", "%s", phonePos);
+            telemetry.addData("Target Postition", "%s", servoPos);
+            telemetry.addData("X , Z", "%s :X %s :Z", x, z);
 
-            if (x >= tX - 1.53) {
-                finished = true;
+            if (x >= tX - 1.53 && x <= tX && z >= tZ - 1.53 && z <= tZ) {//needs fixing
+                //finished = true;
             }
-
             lastTime = runtime.milliseconds();
 
             telemetry.update();
@@ -234,11 +255,16 @@ public abstract class Robot extends LinearOpMode {
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
         OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
 
-//        while (pose == null){
-//            //do nothing!
-//        }
 
-        //x = pose.getTranslation().get(0)/25.4;
+        relicTrackables.activate();
+
+        while (pose == null){
+            //do nothing!
+            pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+
+        }
+
+        x = pose.getTranslation().get(0)/25.4;
         tX = x + in;
 
         rightFront.setPower(power);
@@ -276,6 +302,11 @@ public abstract class Robot extends LinearOpMode {
             }
 
             lastTime = runtime.milliseconds();
+
+            double servoPos = Math.atan(-x/10) / (3.14) + 0.5; //should return between 0 and 1
+            //should divide by pi but not sensitive enough (doesn't move enough)
+            phone.setPosition(servoPos);
+            telemetry.addData("Target Postition", "%s", servoPos);
 
             telemetry.update();
 

@@ -127,7 +127,7 @@ public class VuforiaTesting extends LinearOpMode {
                 /* Found an instance of the template. In the actual game, you will probably
                  * loop until this condition occurs, then move on to act accordingly depending
                  * on which VuMark was visible. */
-                telemetry.addData("VuMark", "%s visible", vuMark);
+                //telemetry.addData("VuMark", "%s visible", vuMark);
 
                 /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
                  * it is perhaps unlikely that you will actually need to act on this pose information, but
@@ -135,7 +135,7 @@ public class VuforiaTesting extends LinearOpMode {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener)relicTemplate.getListener()).getPose();
                 OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)relicTemplate.getListener()).getUpdatedRobotLocation();
 
-                telemetry.addData("Pose", format(pose));
+                //telemetry.addData("Pose", format(pose));
 
                 /* We further illustrate how to decompose the pose into useful rotational and
                  * translational components */
@@ -144,9 +144,9 @@ public class VuforiaTesting extends LinearOpMode {
                     Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
                     // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                    double tX = trans.get(0);
-                    double tY = trans.get(1);
-                    double tZ = trans.get(2);
+                    double tX = trans.get(0) / 25.4;
+                    double tY = trans.get(1) / 25.4;
+                    double tZ = trans.get(2) / 25.4;
 
                     // Extract the rotational components of the target relative to the robot
                     double rX = rot.firstAngle;
