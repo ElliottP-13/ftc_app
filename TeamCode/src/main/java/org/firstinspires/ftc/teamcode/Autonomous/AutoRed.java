@@ -27,73 +27,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * Created by pryor on 1/11/2018.
  */
 @Autonomous(name = "Red Autonomous", group = "Autonomous")
-public class AutoRed extends LinearOpMode {
-
-    VuforiaLocalizer vuforia;
-
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFront = null;
-    private DcMotor leftBack = null;
-
-    private DcMotor rightFront = null;
-    private DcMotor rightBack = null;
-
-    private DcMotor arm1 = null;
-    private DcMotor arm2 = null;
-
-    private Servo leftServo = null;
-    private Servo rightServo = null;
-
-    private ColorSensor colorSensor = null;
-    private DistanceSensor distanceSensor = null;
-
-    private double msPerCm = 11;//just a guess we will refine later
-    //msPerCm log
-    //11 = 11.8V
-
-    private double msPerDeg = 300; //just a guess we will refine later
+public class AutoRed extends Robot {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        /*
-         * To start up Vuforia, tell it the view that we wish to use for camera monitor (on the RC phone);
-         * If no camera monitor is desired, use the parameterless constructor instead (commented out below).
-         */
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-
-        // OR...  Do Not Activate the Camera Monitor View, to save power
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
-
-        /*
-         * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-         * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-         * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-         * web site at https://developer.vuforia.com/license-manager.
-         *
-         * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-         * random data. As an example, here is a example of a fragment of a valid key:
-         *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-         * Once you've obtained a license key, copy the string from the Vuforia web site
-         * and paste it in to your code onthe next line, between the double quotes.
-         */
-        parameters.vuforiaLicenseKey = "AT/9j9n/////AAAAGfut9qsmlkSAj/EuRSYOAYAN+mYb3Re80hY2qXsNPI8W7iZ3Ttg5BMsJgJ0HGyHVWoTGfG9ma3h58XKFj69bvy4IIjR4usiMTxfD335J3Zdy40RqeSz2NoFkRhtzZ3Es2rkCcGhcKQjAbphxvhi35GvAr/W3eOvbjwujiSQ5/yRIcTotiBWuwgQnEhbI0ZQBMTOssU9UAH5Dda2av9leohksx3GhNE/dvRJPXjS8398X7b9X9JADGSaSJp9qIt1Jnnu0kKSRSUoIFADk8Dv1j4VAIq0Sud9oZrUy3oqAVadJDqD0xhHQn8IjUp1+ju6zXKAl6uqXsi6xmeKjEkTpF5IvFsKt+z8Alx4d+zZ6osOs";
-
-        /*
-         * We also indicate which camera on the RC that we wish to use.
-         * Here we chose the back (HiRes) camera (for greater range), but
-         * for a competition robot, the front camera might be more convenient.
-         */
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-
-        /**
-         * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable
-         * in this data set: all three of the VuMarks in the game were created from this one template,
-         * but differ in their instance id information.
-         * @see VuMarkInstanceId
-         */
         VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         VuforiaTrackable relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
@@ -106,13 +44,12 @@ public class AutoRed extends LinearOpMode {
 
         int threshhold = 10;
 
-        if (colorSensor.blue() > threshhold && colorSensor.red() < threshhold){
+        if (colorSensor.blue() > threshhold && colorSensor.red() < threshhold) {
             //we see blue ball hit it
 
-        } else if (colorSensor.blue() < threshhold && colorSensor.red() > threshhold){
+        } else if (colorSensor.blue() < threshhold && colorSensor.red() > threshhold) {
             //we see the red ball hit the other one!
         }
-
 
 
         /**
@@ -124,14 +61,32 @@ public class AutoRed extends LinearOpMode {
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
 
-            if(vuMark == RelicRecoveryVuMark.CENTER){
+            if (vuMark == RelicRecoveryVuMark.CENTER) {
                 //RUN CENTER CODE
-            } else if(vuMark == RelicRecoveryVuMark.LEFT) {
+                vuforiaDrive(-63.7);
+            } else if (vuMark == RelicRecoveryVuMark.LEFT) {
                 //RUN LEFT CODE
-            }
-            else if(vuMark == RelicRecoveryVuMark.RIGHT){
+                vuforiaDrive(-78.2);
+            } else if (vuMark == RelicRecoveryVuMark.RIGHT) {
                 //RUN RIGHT CODE
+                vuforiaDrive(-50.7);
+            }
 
+            nap(250);
+            turnToDegree(60);
+            driveStraight(33.5);
+            spinToDegree(90);
+            driveStraight(10);
+
+            nap(250);
+
+            leftServo.setPosition(0);
+            rightServo.setPosition(1);
+
+            for(int i = 0; i <3; i++){
+                driveStraight(-10);
+
+                driveStraight(10, 0.5);
             }
 
 
@@ -172,92 +127,6 @@ public class AutoRed extends LinearOpMode {
         }
 
         telemetry.update();
-
-    }
-
-    private void driveStraight(double cm) {
-
-        double power = (cm > 0) ? 1 : -1;
-        double timeToRun = cm * msPerCm;
-
-        rightFront.setPower(power);
-        rightBack.setPower(power);
-        leftFront.setPower(power);
-        leftBack.setPower(power);
-
-        runtime.reset();
-
-        while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
-            //DO NOTHING!
-        }
-
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-
-
-    }
-
-    private void turn(double degree) {
-
-        double power = (degree > 0) ? .7 : -.7;
-        double timeToRun = degree * msPerDeg;
-
-        rightFront.setPower(power);
-        rightBack.setPower(power);
-        leftFront.setPower(-power);
-        leftBack.setPower(-power);
-
-        runtime.reset();
-
-        while (opModeIsActive() && runtime.milliseconds() < timeToRun) {
-            //DO NOTHING!
-        }
-
-        rightFront.setPower(0);
-        rightBack.setPower(0);
-        leftFront.setPower(0);
-        leftBack.setPower(0);
-
-
-    }
-
-    private void initialize() {
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-
-        leftFront = hardwareMap.get(DcMotor.class, "left front");
-        leftBack = hardwareMap.get(DcMotor.class, "left back");
-        rightFront = hardwareMap.get(DcMotor.class, "right front");
-        rightBack = hardwareMap.get(DcMotor.class, "right back");
-
-        arm1 = hardwareMap.get(DcMotor.class, "arm");
-        arm2 = hardwareMap.get(DcMotor.class, "arm 2");
-        //dropper = hardwareMap.get(Servo.class, "dropper");
-        leftServo = hardwareMap.get(Servo.class, "left hook");
-        rightServo = hardwareMap.get(Servo.class, "right hook");
-
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
-
-
-
-        //dropper.setPosition(0);
-
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
-
-        arm2.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        // Most robots need the motor on one side to be reversed to drive forward
-        // Reverse the motor that runs backwards when connected directly to the battery
-        leftFront.setDirection(DcMotor.Direction.REVERSE);
-        leftBack.setDirection(DcMotor.Direction.REVERSE);
-
-        rightFront.setDirection(DcMotor.Direction.FORWARD);
-        rightBack.setDirection(DcMotor.Direction.FORWARD);
 
     }
 

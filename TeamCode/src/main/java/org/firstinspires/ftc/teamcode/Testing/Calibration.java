@@ -18,12 +18,27 @@ public class Calibration extends Robot {
 
         waitForStart();
 
-        //vuforiaDrive(55.5);
-//        nap(250);
-//        turnToDegree(90);
-//        driveStraight(29);
+        phone.setPosition(0.5);
 
-        vuforiaTrack(-10,10,0);
+
+        vuforiaDrive(-50.7);
+        telemetry.addLine("Done Driving");
+        nap(250);
+        turnToDegree(60);
+        driveStraight(33.5);
+        spinToDegree(90);
+        driveStraight(10);
+        nap(250);
+
+        for(int i = 0; i <3; i++){
+            driveStraight(-10);
+            nap(250);
+
+            driveStraight(15);
+        }
+
+
+        //vuforiaTrack(-10,10,0);
 
         nap(10000);
 

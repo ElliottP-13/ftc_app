@@ -44,8 +44,6 @@ public class gyroTele extends LinearOpMode {
     private BNO055IMU imu = null;
     private double initialHeading;
 
-    private Servo dropper = null;
-
 
 
     @Override
@@ -53,12 +51,34 @@ public class gyroTele extends LinearOpMode {
         initialize();
         waitForStart();
 
+        boolean y = false;
+        boolean x = false;
+
         while (opModeIsActive()){
 
             double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
-            double robotAngle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x) - Math.PI / 4;
-            robotAngle -= Math.toRadians(getRelativeHeading());
+            boolean relativeDrive = true;
+
+            if(gamepad1.x && !x){
+                x = true;
+                relativeDrive = false;
+            }else {
+                x = false;
+            }
+
+            if(gamepad1.y && !y){
+                y = true;
+                relativeDrive = true;
+                resetHeading();
+            }else {
+                y = false;
+            }
+
+            double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
+            if(relativeDrive) {
+                robotAngle -= Math.toRadians(getRelativeHeading());
+            }
 
             double rightX = -gamepad1.right_stick_x;
 
@@ -68,6 +88,8 @@ public class gyroTele extends LinearOpMode {
             final double rb = r * Math.cos(robotAngle) - rightX;
 
             double div = 1;
+
+
 
             if(gamepad1.left_bumper){
                 div = 2;
@@ -153,7 +175,7 @@ public class gyroTele extends LinearOpMode {
         rightGrab = hardwareMap.get(DcMotor.class,"grabber right");
         spindle = hardwareMap.get(DcMotor.class, "spindle");
 
-        dropper = hardwareMap.get(Servo.class, "dropper");
+        //dropper = hardwareMap.get(Servo.class, "dropper");
         leftServo = hardwareMap.get(Servo.class, "left hook");
         rightServo = hardwareMap.get(Servo.class, "right hook");
 
@@ -176,8 +198,6 @@ public class gyroTele extends LinearOpMode {
 
 
         rightGrab.setDirection(DcMotor.Direction.REVERSE);
-
-        dropper.setPosition(0);
 
         leftServo.setPosition(1);
         rightServo.setPosition(-1);

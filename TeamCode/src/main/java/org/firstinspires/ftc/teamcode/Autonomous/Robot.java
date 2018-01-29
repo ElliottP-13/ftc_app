@@ -33,29 +33,32 @@ public abstract class Robot extends LinearOpMode {
 
     public VuforiaLocalizer vuforia;
 
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFront = null;
-    private DcMotor leftBack = null;
+    public ElapsedTime runtime = new ElapsedTime();
+    public DcMotor leftFront = null;
+    public DcMotor leftBack = null;
 
-    private DcMotor rightFront = null;
-    private DcMotor rightBack = null;
+    public DcMotor rightFront = null;
+    public DcMotor rightBack = null;
 
-    private DcMotor arm1 = null;
+    public DcMotor arm1 = null;
 
-    private DcMotor leftGrab = null;
-    private DcMotor rightGrab = null;
+    public DcMotor leftGrab = null;
+    public DcMotor rightGrab = null;
 
-    private DcMotor spindle = null;
+    public DcMotor spindle = null;
 
-    private Servo leftServo = null;
-    private Servo rightServo = null;
+    public Servo leftServo = null;
+    public Servo rightServo = null;
     public Servo phone = null;
 
-    private ColorSensor colorSensor = null;
-    private DistanceSensor distanceSensor = null;
+    public Servo twist = null;
+    public Servo upDown = null;
 
-    private BNO055IMU imu = null;
-    private double initialHeading;
+    public ColorSensor colorSensor = null;
+    public DistanceSensor distanceSensor = null;
+
+    public BNO055IMU imu = null;
+    public double initialHeading;
 
 
     public void initialize(HardwareMap map) {
@@ -80,6 +83,9 @@ public abstract class Robot extends LinearOpMode {
         rightServo = map.get(Servo.class, "right hook");
         phone = map.get(Servo.class, "phone servo");
 
+        twist = map.get(Servo.class, "arm twist");
+        upDown = map.get(Servo.class, "arm up");
+
         colorSensor = map.get(ColorSensor.class, "sensor");
         distanceSensor = map.get(DistanceSensor.class, "sensor");
 
@@ -95,9 +101,12 @@ public abstract class Robot extends LinearOpMode {
 
         //dropper.setPosition(0);
 
-        leftServo.setPosition(0.52);
-        rightServo.setPosition(0.59);
+        leftServo.setPosition(0.32);
+        rightServo.setPosition(0.79);
         phone.setPosition(0.5);
+
+        twist.setPosition(0.69);
+        upDown.setPosition(1);
 
         rightGrab.setDirection(DcMotor.Direction.REVERSE);
 
@@ -110,11 +119,14 @@ public abstract class Robot extends LinearOpMode {
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", map.appContext.getPackageName());
         VuforiaLocalizer.Parameters vuforiaParams = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         vuforiaParams.vuforiaLicenseKey = "AT/9j9n/////AAAAGfut9qsmlkSAj/EuRSYOAYAN+mYb3Re80hY2qXsNPI8W7iZ3Ttg5BMsJgJ0HGyHVWoTGfG9ma3h58XKFj69bvy4IIjR4usiMTxfD335J3Zdy40RqeSz2NoFkRhtzZ3Es2rkCcGhcKQjAbphxvhi35GvAr/W3eOvbjwujiSQ5/yRIcTotiBWuwgQnEhbI0ZQBMTOssU9UAH5Dda2av9leohksx3GhNE/dvRJPXjS8398X7b9X9JADGSaSJp9qIt1Jnnu0kKSRSUoIFADk8Dv1j4VAIq0Sud9oZrUy3oqAVadJDqD0xhHQn8IjUp1+ju6zXKAl6uqXsi6xmeKjEkTpF5IvFsKt+z8Alx4d+zZ6osOs";
         vuforiaParams.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(vuforiaParams);
+
+        vuforia = ClassFactory.createVuforiaLocalizer(vuforiaParams);
+
+        resetHeading();
 
 
     }
@@ -187,7 +199,6 @@ public abstract class Robot extends LinearOpMode {
             if (pose != null) {
 
                 rotation = Orientation.getOrientation(pose, AxesReference.INTRINSIC, AxesOrder.XYZ, AngleUnit.RADIANS);
-
                 // Extract the X component of the offset of the target relative to the robot
                 x = pose.getTranslation().get(0) / 25.4;
                 z = pose.getTranslation().get(2) / 25.4;
@@ -244,7 +255,7 @@ public abstract class Robot extends LinearOpMode {
         double x = 0;
 
         double dir = (in > 0) ? 1 : -1;
-        double power = 0.7 * dir;
+        double power = 0.7;
 
         double tX;
 
@@ -258,19 +269,18 @@ public abstract class Robot extends LinearOpMode {
 
         relicTrackables.activate();
 
-        while (pose == null){
+        while (pose == null && opModeIsActive()){
             //do nothing!
             pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
-
         }
 
         x = pose.getTranslation().get(0)/25.4;
         tX = x + in;
 
-        rightFront.setPower(power);
-        rightBack.setPower(power);
-        leftFront.setPower(power);
-        leftBack.setPower(power);
+        rightFront.setPower(power * dir);
+        rightBack.setPower(power * dir);
+        leftFront.setPower(power * dir);
+        leftBack.setPower(power * dir);
 
         runtime.reset();
 
@@ -279,7 +289,8 @@ public abstract class Robot extends LinearOpMode {
         double lastTime = runtime.milliseconds();
         double time;
 
-        while (!finished) {
+        while (!finished && opModeIsActive()) {
+            pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
             if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
                 telemetry.addData("VuMark", "%s visible", vuMark);
                 pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
@@ -289,15 +300,16 @@ public abstract class Robot extends LinearOpMode {
                 if (pose != null) {
                     // Extract the X component of the offset of the target relative to the robot
                     x = pose.getTranslation().get(0) / 25.4;
+                    telemetry.addData("X", "%s visible", x);
                 }
             } else {
                 time = runtime.milliseconds() - lastTime;
-                x += (0.0461 * time); //projects the change in distance if the target isn't visible.
+                x += (0.0461 * time) * dir; //projects the change in distance if the target isn't visible.
 
-                telemetry.addData("X", "%s visible", x);
+
             }
 
-            if (x >= tX - 1.53) {
+            if (x >= tX - 1.53 && x <= tX + 1.53) {
                 finished = true;
             }
 
@@ -306,21 +318,26 @@ public abstract class Robot extends LinearOpMode {
             double servoPos = Math.atan(-x/10) / (3.14) + 0.5; //should return between 0 and 1
             //should divide by pi but not sensitive enough (doesn't move enough)
             phone.setPosition(servoPos);
-            telemetry.addData("Target Postition", "%s", servoPos);
+            telemetry.addData("Target Postition", "%s", tX);
+            telemetry.addData("Current X", "%s", x);
 
             telemetry.update();
 
-            if (getRelativeHeading() - initialHeading > 0) {
+            dir = (in - x > 0) ? 1 : -1;
+
+            if ((getRelativeHeading() - initialHeading) * dir > 0) {
                 rightFront.setPower(rightFront.getPower() - (.05 * dir));
                 rightBack.setPower(rightBack.getPower() - (.05 * dir));
-                leftFront.setPower(power);
-                leftBack.setPower(power);
-            } else if (getRelativeHeading() - initialHeading < 0) {
-                rightFront.setPower(power);
-                rightBack.setPower(power);
+                leftFront.setPower(power * dir );
+                leftBack.setPower(power * dir );
+            } else if ((getRelativeHeading() - initialHeading) * dir < 0) {
+                rightFront.setPower(power * dir);
+                rightBack.setPower(power * dir);
                 leftFront.setPower(leftFront.getPower() - (.05 * dir));
                 leftBack.setPower(leftBack.getPower() - (.05 * dir));
             }
+
+
 
 
             nap(50);
@@ -335,9 +352,14 @@ public abstract class Robot extends LinearOpMode {
 
     public void driveStraight(double in) {
 
+        driveStraight(in, 0.7);
+    }
+
+    public void driveStraight(double in, double pow) {
+
         double dir = (in > 0) ? 1 : -1;
-        double power = 0.7 * dir;
-        double timeToRun = (in - 1.5293) / 0.0461;
+        double power = pow * dir;
+        double timeToRun = (Math.abs(in) - 1.5293) / 0.0461;
 
         rightFront.setPower(power);
         rightBack.setPower(power);
@@ -437,6 +459,39 @@ public abstract class Robot extends LinearOpMode {
 
     }
 
+    public void spinToDegree(double degree) {
+
+        double dir = (degree - getRelativeHeading() > 0) ? 1 : -1;
+
+        rightFront.setPower(.292893 * dir);//1.70711
+        rightBack.setPower(1.70711 * dir);//.29
+        leftFront.setPower(-.292893 * dir);//1.7
+        leftBack.setPower(-1.70711 * dir);//.292893
+
+
+        //resetHeading();
+        //double currentHeading = getAbsoluteHeading();
+        runtime.reset();
+
+        while (opModeIsActive() && ((getRelativeHeading() > degree + 5) || (getRelativeHeading() < degree - 5))) {
+            //DO NOTHING!
+            updateTelemetry();
+        }
+
+        rightFront.setPower(0);
+        rightBack.setPower(0);
+        leftFront.setPower(0);
+        leftBack.setPower(0);
+
+        nap(100);
+
+        if ((getRelativeHeading() > degree + 5) || (getRelativeHeading() < degree - 5)) {
+            turnToDegree(degree);
+        }
+
+
+    }
+
     public void turn(double degree) {
 
         double power = (degree > 0) ? .5 : -.5;
@@ -492,7 +547,15 @@ public abstract class Robot extends LinearOpMode {
     }
 
     private void updateTelemetry() {
-        //telemetry.addData("Heading", "Angle = %.2f", getRelativeHeading());
-        //telemetry.update();
+//        telemetry.addData("Heading", "Angle = %.2f", getRelativeHeading());
+//        telemetry.update();
+    }
+
+    public void goToPosition(Servo servo, double pos){
+        servo.setPosition(pos);
+        while(servo.getPosition() != pos){
+            telemetry.addData("Servo Pos: ", "%s", servo.getPosition());
+            updateTelemetry();
+        }
     }
 }
