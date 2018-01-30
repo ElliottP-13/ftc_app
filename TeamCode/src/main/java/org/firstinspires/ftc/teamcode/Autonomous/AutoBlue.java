@@ -41,6 +41,8 @@ public class AutoBlue extends Robot {
 
         relicTrackables.activate();
 
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+
         goToPosition(twist, 0.55);
         nap(500);
         goToPosition(upDown, 0.70);
@@ -62,12 +64,13 @@ public class AutoBlue extends Robot {
 
         telemetry.addData("Blue ", "%s", colorSensor.blue());
         telemetry.addData("Red", "%s", colorSensor.red());
+        telemetry.update();
 
-        if (colorSensor.blue() > threshhold && colorSensor.red() < threshhold){
+        if (colorSensor.blue()-colorSensor.red() > threshhold){
             //we see blue ball hit the other one
             goToPosition(twist, 0.30);
 
-        } else if (colorSensor.blue() < threshhold && colorSensor.red() > threshhold){
+        } else if (colorSensor.red() - colorSensor.blue() > threshhold){
             //we see the red ball hit it!
             goToPosition(twist, 0.90);
         }
@@ -79,8 +82,6 @@ public class AutoBlue extends Robot {
         twist.setPosition(1);
 
 
-
-
         /**
          * See if any of the instances of {@link relicTemplate} are currently visible.
          * {@link RelicRecoveryVuMark} is an enum which can have the following values:
@@ -88,10 +89,18 @@ public class AutoBlue extends Robot {
          * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
          */
 
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
-        while (vuMark == RelicRecoveryVuMark.UNKNOWN){
-            vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        boolean loop = true;
+
+        while (loop && opModeIsActive()){
+            try {
+                vuMark = RelicRecoveryVuMark.from(relicTemplate);
+            } catch (FailureException e){
+                
+            }
+            if(vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                loop = false;
+            }
         }
 
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
