@@ -250,7 +250,9 @@ public abstract class Robot extends LinearOpMode {
 
     }
 
-    public void vuforiaDrive(double in) {
+    public void vuforiaDrive(double in, VuforiaTrackable relicTemplate) {
+        telemetry.addLine("In Drive");
+        telemetry.update();
         boolean finished = false;
         double x = 0;
 
@@ -259,15 +261,16 @@ public abstract class Robot extends LinearOpMode {
 
         double tX;
 
-        VuforiaTrackables relicTrackables = vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        telemetry.addLine("declared vuMark");
+        telemetry.update();
         OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+        telemetry.addLine("Got Pose");
+        telemetry.update();
 
 
-        relicTrackables.activate();
+        //relicTrackables.activate();
 
         while (pose == null && opModeIsActive()){
             //do nothing!
@@ -288,6 +291,9 @@ public abstract class Robot extends LinearOpMode {
 
         double lastTime = runtime.milliseconds();
         double time;
+
+        telemetry.addLine("Starting Drive");
+        telemetry.update();
 
         while (!finished && opModeIsActive()) {
             pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
@@ -351,7 +357,6 @@ public abstract class Robot extends LinearOpMode {
     }
 
     public void driveStraight(double in) {
-
         driveStraight(in, 0.7);
     }
 
@@ -463,10 +468,10 @@ public abstract class Robot extends LinearOpMode {
 
         double dir = (degree - getRelativeHeading() > 0) ? 1 : -1;
 
-        rightFront.setPower(.292893 * dir);//1.70711
-        rightBack.setPower(1.70711 * dir);//.29
-        leftFront.setPower(-.292893 * dir);//1.7
-        leftBack.setPower(-1.70711 * dir);//.292893
+        rightBack.setPower(.292893 * dir);//1.70711
+        rightFront.setPower(1.70711 * dir);//.29
+        leftBack.setPower(-.292893 * dir);//1.7
+        leftFront.setPower(-1.70711 * dir);//.292893
 
 
         //resetHeading();

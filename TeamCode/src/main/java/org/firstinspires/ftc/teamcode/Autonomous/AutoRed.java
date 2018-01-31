@@ -40,17 +40,42 @@ public class AutoRed extends Robot {
         telemetry.update();
         waitForStart();
 
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+
         relicTrackables.activate();
+
+        twist.setPosition(0.55);
+        goToPosition(upDown, 0.70);
+
+        goToPosition(twist, 0.61);
+        nap(500);
+        goToPosition(upDown, 0.28);
+
+        nap(2000);
+
 
         int threshhold = 10;
 
-        if (colorSensor.blue() > threshhold && colorSensor.red() < threshhold) {
-            //we see blue ball hit it
 
-        } else if (colorSensor.blue() < threshhold && colorSensor.red() > threshhold) {
-            //we see the red ball hit the other one!
+        telemetry.addData("Blue ", "%s", colorSensor.blue());
+        telemetry.addData("Red", "%s", colorSensor.red());
+        telemetry.update();
+
+        if (colorSensor.blue() - colorSensor.red() > threshhold){
+            //we see blue ball hit the other one
+            goToPosition(twist, 0.30);
+
+        } else if (colorSensor.red() - colorSensor.blue() > threshhold){
+            //we see the red ball hit it!
+            goToPosition(twist, 0.90);
         }
 
+        nap(1000);
+
+        goToPosition(upDown, 0.40);
+
+        upDown.setPosition(1);
+        twist.setPosition(0.69);
 
         /**
          * See if any of the instances of {@link relicTemplate} are currently visible.
@@ -58,18 +83,29 @@ public class AutoRed extends Robot {
          * UNKNOWN, LEFT, CENTER, and RIGHT. When a VuMark is visible, something other than
          * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
          */
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+
+
+        boolean loop = true;
+
+        while (loop && opModeIsActive()){
+            vuMark = RelicRecoveryVuMark.from(relicTemplate);
+
+            if(vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                loop = false;
+            }
+        }
+
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
 
             if (vuMark == RelicRecoveryVuMark.CENTER) {
                 //RUN CENTER CODE
-                vuforiaDrive(-63.7);
+                driveStraight(-63.7);
             } else if (vuMark == RelicRecoveryVuMark.LEFT) {
                 //RUN LEFT CODE
-                vuforiaDrive(-78.2);
+                driveStraight(-78.2);
             } else if (vuMark == RelicRecoveryVuMark.RIGHT) {
                 //RUN RIGHT CODE
-                vuforiaDrive(-50.7);
+                driveStraight(-50.7);
             }
 
             nap(250);
@@ -77,7 +113,6 @@ public class AutoRed extends Robot {
             driveStraight(33.5);
             spinToDegree(90);
             driveStraight(10);
-
             nap(250);
 
             leftServo.setPosition(0);
@@ -86,41 +121,54 @@ public class AutoRed extends Robot {
             for(int i = 0; i <3; i++){
                 driveStraight(-10);
 
-                driveStraight(10, 0.5);
+                driveStraight(20, 0.5);
             }
 
+            driveStraight(-20);
 
-                /* Found an instance of the template. In the actual game, you will probably
-                 * loop until this condition occurs, then move on to act accordingly depending
-                 * on which VuMark was visible. */
-            telemetry.addData("VuMark", "%s visible", vuMark);
+            turnToDegree(-90);
+            driveStraight(14);
 
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
+            spindle.setPower(-1);
+            nap(900);
+            spindle.setPower(0);
 
-            //telemetry.addData("Pose", format(pose));
+            leftGrab.setPower(-1);
+            rightGrab.setPower(-1);
+            driveStraight(12);
 
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-            if (pose != null) {
-                VectorF trans = pose.getTranslation();
-                Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+            int dir = 1;
 
-                // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                double tX = trans.get(0);
-                double tY = trans.get(1);
-                double tZ = trans.get(2);
+            runtime.reset();
+            while (runtime.milliseconds() < 3000){
+                rightFront.setPower(.5 * dir);
+                leftFront.setPower(.5 * dir);
+                rightBack.setPower(.5 * dir);
+                leftBack.setPower(.5 * dir);
 
-                // Extract the rotational components of the target relative to the robot
-                double rX = rot.firstAngle;
-                double rY = rot.secondAngle;
-                double rZ = rot.thirdAngle;
-
-                telemetry.addLine("X: " + tX + " Y: " + tY + " Z: " + tZ);
-                telemetry.addLine("rX: " + rX + " rY: " + rY + " rZ: " + rZ);
+                if(runtime.milliseconds() % 600 <= 2) {
+                    dir *= -1;
+                }
             }
+
+            rightFront.setPower(.2);
+            leftFront.setPower(.2);
+            rightBack.setPower(.2);
+            leftBack.setPower(.2);
+
+            leftServo.setPosition(0.32);
+            rightServo.setPosition(0.79);
+
+            nap(700);
+
+            rightFront.setPower(0);
+            leftFront.setPower(0);
+            rightBack.setPower(0);
+            leftBack.setPower(0);
+
+            leftGrab.setPower(0);
+            rightGrab.setPower(0);
+
 
         } else {
             telemetry.addData("VuMark", "not visible");

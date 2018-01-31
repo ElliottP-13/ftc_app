@@ -21,7 +21,7 @@ public class Calibration extends Robot {
         phone.setPosition(0.5);
 
 
-        vuforiaDrive(-50.7);
+        //vuforiaDrive(-50.7);
         telemetry.addLine("Done Driving");
         nap(250);
         turnToDegree(60);
@@ -34,7 +34,7 @@ public class Calibration extends Robot {
             driveStraight(-10);
             nap(250);
 
-            driveStraight(15);
+            driveStraight(20);
         }
 
 

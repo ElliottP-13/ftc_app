@@ -38,6 +38,9 @@ public class gyroTele extends LinearOpMode {
     private Servo leftServo = null;
     private Servo rightServo = null;
 
+    private Servo twist = null;
+    private Servo upDown = null;
+
     private ColorSensor colorSensor = null;
     private DistanceSensor distanceSensor = null;
 
@@ -54,11 +57,16 @@ public class gyroTele extends LinearOpMode {
         boolean y = false;
         boolean x = false;
 
-        while (opModeIsActive()){
+        double heading = 0;
 
+        boolean relativeDrive = false;
+        boolean spinDrive = false;
+        double rightX;
+
+        while (opModeIsActive()){
             double r = Math.hypot(gamepad1.left_stick_x, gamepad1.left_stick_y);
 
-            boolean relativeDrive = true;
+
 
             if(gamepad1.x && !x){
                 x = true;
@@ -70,9 +78,16 @@ public class gyroTele extends LinearOpMode {
             if(gamepad1.y && !y){
                 y = true;
                 relativeDrive = true;
-                resetHeading();
             }else {
                 y = false;
+            }
+
+            if (gamepad1.right_trigger > 0){
+                telemetry.addLine("spin");
+                spinDrive = true;
+
+            } else{
+                spinDrive = false;
             }
 
             double robotAngle = Math.atan2(gamepad1.left_stick_y, gamepad1.left_stick_x) - Math.PI / 4;
@@ -80,7 +95,10 @@ public class gyroTele extends LinearOpMode {
                 robotAngle -= Math.toRadians(getRelativeHeading());
             }
 
-            double rightX = -gamepad1.right_stick_x;
+            if(spinDrive){
+                rightX = getRelativeHeading();
+            }
+            rightX = -gamepad1.right_stick_x;
 
             final double lf = r * Math.cos(robotAngle) + rightX;
             final double rf = r * Math.sin(robotAngle) - rightX;
@@ -88,8 +106,6 @@ public class gyroTele extends LinearOpMode {
             final double rb = r * Math.cos(robotAngle) - rightX;
 
             double div = 1;
-
-
 
             if(gamepad1.left_bumper){
                 div = 2;
@@ -112,13 +128,10 @@ public class gyroTele extends LinearOpMode {
             double armPow = -gamepad2.left_stick_y;
             arm1.setPower(armPow);
 
-            telemetry.update();
-
-
-            if(gamepad2.right_bumper){
+            if(gamepad2.left_bumper){
                 leftServo.setPosition(leftServo.getPosition() - .03);
                 rightServo.setPosition(rightServo.getPosition() + .03);
-            } else if (gamepad2.left_bumper){
+            } else if (gamepad2.right_bumper){
                 leftServo.setPosition(leftServo.getPosition() + .015);
                 rightServo.setPosition(rightServo.getPosition() - .015);
             } else if (gamepad2.x){
@@ -126,21 +139,20 @@ public class gyroTele extends LinearOpMode {
                 rightServo.setPosition(.59);
             }
 
-            if(gamepad2.a){
-               spindle.setPower(1);
+            if(gamepad2.dpad_up){
+               spindle.setPower(0.5);
             }
-            else if(gamepad2.b) {
-                spindle.setPower(-1);
+            else if(gamepad2.dpad_down) {
+                spindle.setPower(-0.5);
             } else {
                 spindle.setPower(0);
             }
 
-            leftGrab.setPower(gamepad2.right_stick_y);
-            rightGrab.setPower(gamepad2.right_stick_y);
+            leftGrab.setPower(-gamepad2.right_stick_y);
+            rightGrab.setPower(-gamepad2.right_stick_y);
 
-            //right stick down sucks in
-            //a == deploy
-            //b == pull in
+            upDown.setPosition(1);
+            twist.setPosition(0.69);
 
             telemetry.addData("Heading", "Angle = %.2f", getRelativeHeading());
 
@@ -179,6 +191,9 @@ public class gyroTele extends LinearOpMode {
         leftServo = hardwareMap.get(Servo.class, "left hook");
         rightServo = hardwareMap.get(Servo.class, "right hook");
 
+        twist = hardwareMap.get(Servo.class, "arm twist");
+        upDown = hardwareMap.get(Servo.class, "arm up");
+
         colorSensor = hardwareMap.get(ColorSensor.class, "sensor");
         distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor");
 
@@ -195,12 +210,10 @@ public class gyroTele extends LinearOpMode {
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
 
-
-
         rightGrab.setDirection(DcMotor.Direction.REVERSE);
 
-        leftServo.setPosition(1);
-        rightServo.setPosition(-1);
+        leftServo.setPosition(0);
+        rightServo.setPosition(1);
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -210,6 +223,10 @@ public class gyroTele extends LinearOpMode {
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
+    }
+
+    public double getRelativeHeading(double heading) {
+        return AngleUnit.DEGREES.normalize(getAbsoluteHeading() - heading);
     }
 
 }
